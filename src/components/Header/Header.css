@@ -1,0 +1,152 @@
+.header {
+  width: 100%;
+  height: 74px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  display: flex; 
+  justify-content: space-between;
+  padding: 0;
+  background-color: rgba(7, 48, 66, 1);
+}
+
+.header_login {
+  width: 100%;
+  height: 74px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  display: flex; 
+  justify-content: space-between;
+  padding: 0;
+  background-color: rgba(32, 32, 32, 1);
+}
+
+.header__logo {
+  width: 38px;
+  height: 38px;
+  margin: 18px 45px 18px 70px;
+  padding: 0;
+}
+
+.header__layout {
+  padding: 0;
+  margin: 0;
+  display: flex; 
+  justify-content: space-between;
+  flex-direction: row;
+}
+
+.header__registration {
+  width: 77px;
+  height: 16px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  margin-top: 29px;
+  color: rgba(255, 255, 255, 1);
+}
+
+.header__layout_logo {
+  width: 100px;
+  height: 32px;
+  padding: 0;
+  margin-top: 21px;
+  margin-right: 70px;
+  background-image: url("../../images/button/profile_button_.svg");
+  border: none;
+  background-color: rgba(32, 32, 32, 1);
+  border-radius: 40px;
+  box-shadow: 0px 3px 14px 0px rgba(0, 0, 0, 0.08);
+  object-fit: fill;
+}
+
+.header__button {
+  background-color: rgba(61, 220, 132, 1);
+  color: rgba(0, 0, 0, 1);
+  text-align: center;
+  width: 76px;
+  height: 32px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  margin-right: 70px;
+  margin-left: 30px;
+  margin-top: 21px;
+  border: 0;
+}
+
+.button:hover {
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.header__hamburger-button {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 44px;
+  height: 44px;
+  margin-right: 30px;
+  margin-top: 15px;
+  background-color: transparent;
+  border: none;
+  padding: 10px;
+}
+
+@media screen and (max-width: 768px) {
+  .header__logo {
+    margin-left: 30px;
+  }
+
+  .header__button {
+    margin-right: 30px;
+  }
+
+  .header__hamburger-button {
+    display: block;
+    padding: 0;
+    border: none;
+    background: url('../../images/button/hamburger.svg') center no-repeat;
+    background-size: cover;
+  }
+
+  .header__hamburger-button_opened {
+    background: url('../../images/button/close_button.svg') center no-repeat;
+    background-size: cover;
+    position: relative;
+    z-index: 3;
+    width: 22px;
+    height: 22px;
+    margin-right: 30px;
+    margin-top: 15px;
+    border: none;
+  }
+
+}
+
+@media screen and (max-width: 425px) {
+  .header__logo {
+    margin-left: 14px;
+  }
+
+  .header__button {
+    margin-right: 14px;
+    margin-left: 14px;
+    width: 54px;
+    height: 26px;
+    font-size: 10px;
+  }
+
+  .header__registration {
+    width: 64px;
+    font-size: 10px;
+  }
+
+  .header__hamburger-button {
+    width: 40px;
+    height: 43px;
+    margin-right: 14px;
+  }
+}

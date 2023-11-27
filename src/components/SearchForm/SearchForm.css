@@ -1,0 +1,136 @@
+.search-form {
+  width: 100%;
+  max-width: 1280px;
+  display: flex;
+  margin: 0 auto 10px auto;
+  padding: 0;
+  border-bottom: 1px solid rgba(66, 66, 66, 1);
+}
+
+.search-form__container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  max-width: 1140px;
+  width: calc(100% - 140px);
+  height: 72px;
+  margin: 70px auto 69px 70px;
+  background-color: rgba(47, 47, 47, 1);
+  border-radius: 9px;
+  align-content: center;
+}
+
+.search-form__find {
+  display: flex;
+  box-sizing: border-box;
+  padding-right: 30px;
+  border-right: 1px solid rgba(66, 66, 66, 1);
+  align-self: center;
+  width: calc(100% - 226px);
+}
+
+.search-form__field {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+}
+
+.search-form__icon {
+  width: 34px;
+  height: 34px;
+  margin-right: 6px;
+  margin-left: 19px;
+  align-self: center;
+}
+
+.search-form__input {
+  color: rgba(139, 139, 139, 1);
+  font-size: 18px;
+  line-height: 20px;
+  font-weight: 400;
+  background-color: rgba(47, 47, 47, 1);
+  width: 100%;
+  border: 0;
+}
+
+.search-form__button_search {
+  width: 66px;
+  height: 34px;
+  margin-right: 0;
+  color: rgba(255, 255, 255, 1);
+  line-height: 18px;
+  font-size: 11px;
+  font-weight: 500;
+  background-color: rgba(66, 133, 244, 1);
+  margin-left: 21.35px;
+  border-radius: 48px;
+  align-self: center;
+  border: 0;
+}
+
+@media screen and (max-width: 1024px) {
+  .search-form  {
+    max-width: 1024px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .search-form  {
+    max-width: 768px;
+  }
+
+  .search-form__container {
+    max-width: 768px;
+    width: calc(100% - 60px);
+    margin: 80px auto 109px 30px;
+  }
+
+  .search-form__find {
+    padding-right: 19px;
+    width: calc(100% - 207px);
+  }
+
+  .search-form__button_search {
+    width: 77px;
+  }
+}
+
+@media screen and (max-width: 525px) {
+  .search-form  {
+    max-width: 525px;
+  }
+
+  .search-form__container {
+    position: relative;
+  }
+
+  .search-form__find {
+    padding-right: 19px;
+    width: 100%;
+    border-right: none;
+  }
+
+  .search-form__input {
+    font-size: 14px;
+    padding-left: 19px;
+  }
+}
+
+@media screen and (max-width: 320px) {
+  .search-form  {
+    max-width: 320px;
+  }
+
+  .search-form__container {
+    margin-left: 10px;
+    margin-right: 10px;
+    width: 100%;
+  }
+  
+  .search-form__button_search {
+    width: 110px;
+  }
+}
+
