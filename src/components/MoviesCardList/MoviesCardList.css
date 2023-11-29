@@ -30,7 +30,7 @@
   display: flex;
 } 
 
-.movies-card-list__more_button {
+.movies-card-list__button {
   background-color: rgba(47, 47, 47, 1);
   color: rgba(255, 255, 255, 1);
   width: 320px;
@@ -76,13 +76,13 @@
     max-height: 300px;
   }
 
-  .movies-card-list__more_button {
+  .movies-card-list__button {
     margin-bottom: 101px;
   }
 }
 
 @media screen and (max-width: 728px) {
-  .movies-card-list__more_button {
+  .movies-card-list__button {
     width: 240px;
     height: 36px;
   }
@@ -105,7 +105,7 @@
   .movies-card-list__more {
     max-height: 260px;
   } 
-  .movies-card-list__more_button {
+  .movies-card-list__button {
     width: 240px;
     height: 36px;
     margin-bottom: 80px;

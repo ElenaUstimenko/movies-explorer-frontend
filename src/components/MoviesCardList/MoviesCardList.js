@@ -28,7 +28,7 @@ function MoviesCardList() {
   
   return (
     <div className="movies-card-list">
-      <div className="movies-card-list__movies">
+      <ul className="movies-card-list__movies">
         <MoviesCard />
         <MoviesCard />
         <MoviesCard />
@@ -45,11 +45,11 @@ function MoviesCardList() {
         <MoviesCard />
         <MoviesCard />
         <MoviesCard />
-      </div>
+      </ul>
 
       {(pathname === '/movies' ) && (
         <div className="movies-card-list__more">
-          <button className="movies-card-list__more_button">Ещё</button>
+          <button className="button movies-card-list__button">Ещё</button>
         </div>)}
 
     </div>

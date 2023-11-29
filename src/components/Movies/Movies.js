@@ -6,12 +6,12 @@ import { Footer } from '../Footer/Footer.js';
 
 function Movies() {
   return (
-    <div className="movies">
+    <section className="movies">
       <Header />
       <SearchForm />
       <MoviesCardList />
       <Footer />
-    </div>
+    </section>
   );
 }
 

@@ -45,9 +45,8 @@ function Navigation({ active, setActive, burgerMenuActive, setBurgerMenuActive }
             Аккаунт
             <img src={profileIcon} alt="белый кружочек"/>
           </Link>
-       
-      </nav>
-      
+          
+      </nav> 
     </div>
   );
 };       

@@ -55,7 +55,11 @@
   border: 0;
 }
 
-.search-form__button_search {
+.search-form__input:focus {
+  outline: none;
+}
+
+.search-form__button {
   width: 66px;
   height: 34px;
   margin-right: 0;
@@ -92,7 +96,7 @@
     width: calc(100% - 207px);
   }
 
-  .search-form__button_search {
+  .search-form__button {
     width: 77px;
   }
 }
@@ -129,7 +133,7 @@
     width: 100%;
   }
   
-  .search-form__button_search {
+  .search-form__button {
     width: 110px;
   }
 }

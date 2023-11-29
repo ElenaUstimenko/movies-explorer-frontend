@@ -51,11 +51,11 @@ function Header({ loggedIn }) {
 
   return (
     <>
-      <header className={pathname === '/' ? "header" : "header_login"}>
+      <header className={pathname === '/' ? "header" : "header-login"}>
       {(pathname === '/' || pathname === '/movies' || pathname === '/saved-movies' || pathname === '/profile') && (
         <Link to={'/'}>
           <img
-            className="header__logo"
+            className="header-logo"
             src={logo}
             alt="белый улыбающийся смайлик на зелёном фоне"
           />

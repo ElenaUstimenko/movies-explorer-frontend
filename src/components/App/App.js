@@ -22,7 +22,7 @@ function App() {
 
   return (
     <CurrentUserContext.Provider value={{ ...currentUser }}>
-    <div className="page">
+    <body className="page">
       <Routes>
         <Route path='/' element={<Main />} />
         <Route path='/movies' element={<Movies />} />
@@ -35,7 +35,7 @@ function App() {
 
       {isLoading && <Preloader/>}
      
-    </div>
+    </body>
     </CurrentUserContext.Provider>
   );
 }

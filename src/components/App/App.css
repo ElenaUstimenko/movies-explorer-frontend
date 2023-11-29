@@ -8,14 +8,15 @@
   font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
   font-style: normal;
   width: 100%;
+  height: 100%;
+  padding: 0;
   margin: 0 auto;
   box-sizing: border-box;
-  background: rgba(32, 32, 32, 1);
-  margin: 0 auto;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-height: 100%;
+  background-color: rgba(32, 32, 32, 1);
+  background-size: 100%;
 }
 
 .page_no-scroll {

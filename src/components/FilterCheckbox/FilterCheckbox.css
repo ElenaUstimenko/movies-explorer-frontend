@@ -8,7 +8,7 @@
   padding: 0;
 }
 
-.filter-checkbox__button_checkbox {
+.filter-checkbox__button {
   width: 36px;
   height: 20px;
   margin-left: 29px;
@@ -19,11 +19,11 @@
   overflow: hidden;
 }
 
-.filter-checkbox__button_checkbox:hover {
+.filter-checkbox__button:hover {
   cursor: pointer;
 }
 
-.filter-checkbox__button_image {
+.filter-checkbox__image {
   width: 36px;
   height: 20px;
   background-color:rgba(47, 47, 47, 1);
@@ -47,7 +47,7 @@
     max-width: 207px;
   }
 
-  .filter-checkbox__button_checkbox {
+  .filter-checkbox__button {
     margin-left: 19px;
   }
 
@@ -74,7 +74,7 @@
     padding-left: 40px;
   }
 
-  .filter-checkbox__button_checkbox {
+  .filter-checkbox__button {
     margin-left: auto;
   }
 

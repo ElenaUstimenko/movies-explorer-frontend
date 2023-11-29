@@ -21,9 +21,9 @@ function SearchForm() {
   } 
 
   return (
-    <div className="search-form">
+    <section className="search-form">
       <div className="search-form__container">
-        <div className="search-form__find">
+        <form className="search-form__find">
           <label className="search-form__field">
 
             {renderSearchForm()}
@@ -35,11 +35,11 @@ function SearchForm() {
             <span className="search-form__input-error"/>
           </label>  
           <button name="button" type="submit" 
-            className="search-form__button_search">Найти</button>
-        </div>
+            className="search-form__button">Найти</button>
+        </form>
         <FilterCheckbox />
       </div>
-    </div>
+    </section>
   );
 }
 

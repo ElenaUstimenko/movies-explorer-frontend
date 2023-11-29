@@ -14,12 +14,12 @@ function FilterCheckbox() {
   
   return (
     <div className="filter-checkbox">
-      <button name="button" type="checkbox" 
-        className="filter-checkbox__button_checkbox"
+      <button name="button" type="button" 
+        className="filter-checkbox__button"
         checked={isChecked} 
         onClick={() => setIsChecked(isChecked)}>
       <img  
-        className="filter-checkbox__button_image"
+        className="filter-checkbox__image"
         src={isSorted ? sortButtonOn : sortButtonOff} 
         alt='кнопка сортировки' 
         onClick={handleSortClick}

@@ -8,11 +8,11 @@ function NotFound() {
   }
 
   return (
-    <div className="not-found">
+    <section className="not-found">
       <p className="not-found__number">404</p>
       <p className="not-found__text">Страница не найдена</p>
       <p className="not-found__link" onClick={handleClick}>Назад</p>
-    </div>
+    </section>
   ); 
 }
 

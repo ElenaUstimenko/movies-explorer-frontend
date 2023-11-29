@@ -6,12 +6,12 @@ function MoviesCard() {
   const { pathname } = useLocation();
   
   return (
-    <div className="movies-card">
+    <li className="movies-card">
       <Link to='' target='_blank'>
         <img
           className="movies-card__picture"
           src={movie}
-          alt={movie.title}
+          alt={`постер фильма ${movie.title}`}
         />
       </Link>
       <div className="movies-card__name">
@@ -33,7 +33,7 @@ function MoviesCard() {
       </div>
       <p className="movies-card__time">1ч 42м</p>
      
-    </div>
+    </li>
   );
 }
 

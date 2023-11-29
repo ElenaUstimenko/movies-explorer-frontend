@@ -5,7 +5,7 @@ import { Header } from '../Header/Header.js';
 function Profile() {
 
   return (
-    <div className="profile">
+    <section className="profile">
       <Header />
       <div className="profile__container">
         <h3 className="profile__title">Привет, Кто-то!</h3>
@@ -16,17 +16,17 @@ function Profile() {
           // value={name} 
           // onChange={({target: {value}}) => setName(value)}
           />
-          <input id="profile_-input-email" type="email" name="email"
+          <input id="profile-input-email" type="email" name="email"
           className="profile__input_type_email profile__input"
             placeholder="E-mail" minLength={2} maxLength={30} required
           // value={email} 
           // onChange={({target: {value}}) => setEmail(value)}
           />
         </label>
-        <p className="profile__registration">Редактировать</p>
+        <p className="button profile__registration">Редактировать</p>
         <Link className="profile__logout link" to={'/signin'}>Выйти из аккаунта</Link>
       </div>
-    </div>
+    </section>
   );
 }
 

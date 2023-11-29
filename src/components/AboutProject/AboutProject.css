@@ -31,11 +31,11 @@
   margin: 70px auto 0 auto;
 }
 
-.about-project__deadlines_type_weeks {
+.about-project__discription {
   margin-left: 40px;
 }
 
-.about-project__text_main {
+.about-project__main {
   align-self: left;
   color: rgba(255, 255, 255, 1);
   font-size: 20px;
@@ -69,21 +69,21 @@
   margin: 110px auto;
 }
 
-.about-project__weeks_backend {
+.about-project__period-backend {
   width: 100%;
   max-width: 228px;
   max-height: 36px;
   background-color: rgba(61, 220, 132, 1);
 }
 
-.about-project__weeks_frontend {
+.about-project__period-frontend {
   width: 100%;
   max-width: 912px;
   max-height: 36px;
   background-color: rgba(48, 48, 48, 1);
 }
 
-.about-project__weeks_backend__count {
+.about-project__count-backend {
   margin: 9px auto;
   text-align: center;
   font-size: 14px;
@@ -94,7 +94,7 @@
   max-width: 200px;
 }
 
-.about-project__weeks__frontend__count {
+.about-project__count-frontend {
   margin: 9px auto;
   text-align: center;
   font-size: 14px;
@@ -105,7 +105,7 @@
   max-width: 200px;
 }
 
-.about-project__weeks_text {
+.about-project__part {
   margin: 0 auto;
   padding-top: 14px;
   text-align: center;
@@ -116,7 +116,7 @@
 }
 
 @media screen and (max-width: 1239px) {
-  .about-project__text_main {
+  .about-project__main {
     max-width: 380px;
   }
   .about-project__text {
@@ -131,7 +131,7 @@
     max-width: 319px;
     margin: 22px auto 0 0;
   }
-  .about-project__text_main {
+  .about-project__main {
     letter-spacing: -0.8px;
     max-width: 319px;
     max-height: 48px;
@@ -151,7 +151,7 @@
     letter-spacing: -0.4px;
   }
   
-  .about-project__deadlines_type_weeks {
+  .about-project__discription {
     margin-left: 31px;
   }
 
@@ -159,19 +159,19 @@
     margin: 93px auto 90px auto;
   }
   
-  .about-project__weeks_backend {
+  .about-project__period-backend {
     max-width: 140px;
   }
   
-  .about-project__weeks_frontend {
+  .about-project__period-frontend {
     max-width: 528px;
   }
   
-  .about-project__weeks_backend__count {
+  .about-project__count-backend {
     max-width: 120px;
   }
   
-  .about-project__weeks__frontend__count {
+  .about-project__count-frontend {
     max-width: 115.62px;
   }
 }
@@ -197,7 +197,7 @@
     margin: 60px auto 0 auto;
   }
 
-  .about-project__text_main {
+  .about-project__main {
     font-size: 18px;
     letter-spacing: -0.4px;
     max-width: 284px;
@@ -216,21 +216,21 @@
     margin: 60px auto 69px auto;
   }
   
-  .about-project__weeks_backend__count {
+  .about-project__count-backend {
     margin: 11px auto;
     font-size: 11px;
     max-height: 13px;
     max-width: 80px;
   }
   
-  .about-project__weeks__frontend__count {
+  .about-project__count-frontend {
     margin: 11px auto;
     font-size: 11px;
     max-height: 13px;
     max-width: 80px;
   }
   
-  .about-project__weeks_text {
+  .about-project__part {
     padding-top: 10px;
     font-size: 11px;
     line-height: 13.31px;
@@ -247,21 +247,21 @@
     margin: 60px auto 0 auto;
   }
 
-  .about-project__deadlines_type_weeks {
+  .about-project__discription {
     margin-left: 0;
     margin-top: 56px;
   }
 
-  .about-project__weeks_backend {
+  .about-project__period-backend {
     max-width: 100px;
     max-height: 35px;
   }
   
-  .about-project__weeks_frontend {
+  .about-project__period-frontend {
     max-height: 35px;
   }
 
-  .about-project__text_main {
+  .about-project__main {
     letter-spacing: -0.72px;
   }
 }

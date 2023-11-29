@@ -81,11 +81,11 @@ function Register() {
   }
 
   return (
-    <div className="register">
+    <section className="register">
       <div className="register__container">
-      <Link className="register__logo_link" to='/'>
+      <Link className="register__link" to='/'>
           <img
-            className="register__logo"
+            className="register-logo"
             src={logo}
             alt="белый улыбающийся смайлик на зелёном фоне"
           />
@@ -96,7 +96,7 @@ function Register() {
           // onSubmit={handleSubmit}
         >
           <label className="register__field">
-            <h6 className="register__input_title">Имя</h6>
+            <h6 className="register__discription">Имя</h6>
         
             <input id="register-input-name" type="text" name="name"
               className="register__input_type_name register__input"
@@ -109,7 +109,7 @@ function Register() {
             
           </label>
           <label className="register__field">
-            <h6 className="register__input_title">E-mail</h6>
+            <h6 className="register__discription">E-mail</h6>
             <input id="register-input-email" type="email" name="email"
               className="register__input_type_email register__input"
               placeholder="E-mail" minLength={2} maxLength={30} required
@@ -121,7 +121,7 @@ function Register() {
             
           </label>
           <label className="register__field">
-            <h6 className="register__input_title">Пароль</h6>
+            <h6 className="register__discription">Пароль</h6>
             <input id="password-register-input" name="password"
               className="register__input_type_password register__input"
               placeholder="Пароль" type="password" required
@@ -145,7 +145,7 @@ function Register() {
           </div>
         </form> 
       </div> 
-    </div>
+    </section>
   );
 }
 

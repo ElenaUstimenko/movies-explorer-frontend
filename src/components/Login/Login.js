@@ -1,4 +1,5 @@
 import './Login.css';
+import '../Register/Register.css'
 import { Link } from 'react-router-dom';
 import logo from '../../images/logo/logo-smile.svg'
 import { useEffect, useState } from 'react';
@@ -62,9 +63,9 @@ function Login() {
   }
 
   return (
-    <div className="login">
+    <section className="register login">
       <div className="register__container">
-        <Link className="register__logo_link" to='/'>
+        <Link className="register__link" to='/'>
           <img
             className="register__logo"
             src={logo}
@@ -77,7 +78,7 @@ function Login() {
           // onSubmit={handleSubmit}
         >
           <label className="register__field">
-            <h6 className="register__input_title">E-mail</h6>
+            <h6 className="register__discription">E-mail</h6>
             <input id="login-input-email" type="email" name="email"
               className="register__input_type_email register__input"
               placeholder="E-mail" minLength={2} maxLength={30} required
@@ -89,7 +90,7 @@ function Login() {
 
           </label>
           <label className="register__field">
-            <h6 className="register__input_title">Пароль</h6>
+            <h6 className="register__discription">Пароль</h6>
             <input id="password-login-input" name="password"
               className="register__input_type_password register__input"
               placeholder="Пароль" type="password" required
@@ -113,7 +114,7 @@ function Login() {
           </div>
         </form> 
       </div> 
-    </div>
+    </section>
   ); 
 }
 

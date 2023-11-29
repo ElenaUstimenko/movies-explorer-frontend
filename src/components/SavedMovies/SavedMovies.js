@@ -8,12 +8,12 @@ import { MoviesCard } from '../MoviesCard/MoviesCard.js';
 
 function SavedMovies() {
   return (
-    <div className="saved-movies">
+    <section className="saved-movies">
       <Header />
       <SearchForm />
       <MoviesCardList />
       <Footer />
-    </div>
+    </section>
   );
 }
 
