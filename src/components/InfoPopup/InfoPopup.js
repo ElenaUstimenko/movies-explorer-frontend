@@ -8,7 +8,7 @@ function InfoPopup({ message, onSubmit }) {
   };
 
   return (
-    /*<div className={`info-popup ${message && "info-popup_opened"}`}>*/
+    /*<div className={`info-popup ${message && "info-popup__opened"}`}>*/
     <div className="info-popup_opened">
       <form className="info-popup__container" onSubmit={handleSubmit}>
         <h2 className="info-popup__title">{message}</h2>

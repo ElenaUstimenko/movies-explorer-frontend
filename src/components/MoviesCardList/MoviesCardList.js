@@ -27,7 +27,7 @@ function MoviesCardList() {
   }, [currentViewportWidth]);*/
   
   return (
-    <div className="movies-card-list">
+    <section className="movies-card-list">
       <ul className="movies-card-list__movies">
         <MoviesCard />
         <MoviesCard />
@@ -52,7 +52,7 @@ function MoviesCardList() {
           <button className="button movies-card-list__button">Ещё</button>
         </div>)}
 
-    </div>
+    </section>
   );
 }
 

@@ -41,7 +41,7 @@ function Navigation({ active, setActive, burgerMenuActive, setBurgerMenuActive }
           {links.map(({ path, label }) => createNavigationLink(path, label))}
         </ul>
         
-          <Link className="navigation__link navigation__link_type_profile" to={'/profile'}>
+          <Link className="navigation__link navigation__profile" to={'/profile'}>
             Аккаунт
             <img src={profileIcon} alt="белый кружочек"/>
           </Link>

@@ -35,7 +35,7 @@ function SearchForm() {
             <span className="search-form__input-error"/>
           </label>  
           <button name="button" type="submit" 
-            className="search-form__button">Найти</button>
+            className="button search-form__button">Найти</button>
         </form>
         <FilterCheckbox />
       </div>

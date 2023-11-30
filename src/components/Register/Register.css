@@ -91,7 +91,6 @@
   min-height: 12px;
   position: absolute;
   top: 70px;
-
 }
 
 .register__button {
@@ -105,7 +104,6 @@
   line-height: 16.94px;
   font-weight: 500;
   align-self: center;
-  border: 3;
 }
 
 .register__button:hover {
