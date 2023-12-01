@@ -8,10 +8,22 @@ function FilterCheckbox() {
   const [isSorted, setIsSorted] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
 
+  // изменение внешнего вида чекбокса
   const handleSortClick = () =>{
-    setIsSorted(true);
-  }
+    if(!isSorted) {
+      setIsSorted(true);
+    } else {
+      setIsSorted(false);
+    }
+  };
   
+  /*const handleChangeFilter = (e) => {
+    onChangeFilters({
+      key: e.target.name,
+      value: e.target.type === "checkbox" ? e.target.checked : e.target.value,
+    });
+  };*/
+
   return (
     <div className="filter-checkbox">
       <button name="button" type="button" 
@@ -31,3 +43,11 @@ function FilterCheckbox() {
 }
 
 export { FilterCheckbox };
+/*<label>
+          <input
+            name="short"
+            type="checkbox"
+            className="search__filter"
+            onChange={handleChangeFilter}/>
+          <span className="search__visible-filter"/>
+        </label>*/
