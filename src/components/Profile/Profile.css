@@ -1,0 +1,145 @@
+.profile {
+  width: 100%;
+  max-width: 1280px;
+  min-height: 100%;
+  padding: 0;
+  margin: 0 auto;
+  box-sizing: border-box;
+  background-color: rgba(32, 32, 32, 1);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.profile__container {
+  margin: 74px auto 70px auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.profile__title {
+  line-height: 29.05px;
+  color: rgba(255, 255, 255, 1);
+  font-size: 24px;
+  padding: 0;
+  max-width: 204px;
+  max-height: 29px;
+  font-weight: 500;
+  margin: 0 auto 123px auto;
+}
+
+.profile__field {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile__input {
+  line-height: 13.31px;
+  color: rgba(255, 255, 255, 1);
+  font-size: 11px;
+  width: 410px;
+  max-height: 14px;
+  font-weight: 500;
+  background-color: rgba(32, 32, 32, 1);
+  border: 0;
+}
+
+.profile__input:focus {
+  outline: none;
+}
+
+.profile__input_type_name {
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(66, 66, 66, 1);
+}
+
+.profile__input_type_email {
+  padding-top: 17px;
+}
+
+.profile__registration {
+  line-height: 15.73px;
+  color: rgba(255, 255, 255, 1);
+  font-size: 13px;
+  max-width: 410px;
+  max-height: 16px;
+  font-weight: 400;
+  margin: 220px auto 0 auto;
+}
+
+.profile__logout {
+  line-height: 15.73px;
+  color: rgba(238, 52, 101, 1);
+  font-size: 13px;
+  max-width: 410px;
+  max-height: 16px;
+  font-weight: 500;
+  margin: 16px auto 0 auto;
+}
+
+@media screen and (max-width: 1024px) {
+  .profile {
+    max-width: 1024px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .profile {
+    max-width: 768px;
+  }
+
+  .profile__container {
+    margin: 236px auto 269px auto;
+  }
+
+  .profile__title {
+    margin-bottom: 96px;
+  }
+
+  .profile__registration {
+    margin: 210px auto 0 auto;
+  }
+}
+
+@media screen and (max-width: 425px) {
+  .profile {
+    max-width: 425px;
+  }
+
+  .profile__container {
+    margin: 70px auto 40px auto;
+  }
+
+  .profile__title {
+    max-width: 260px;
+    margin: 0 auto 80px auto;
+  }
+
+  .profile__input {
+    width: 260px;
+  }
+
+  .profile__registration {
+    line-height: 14.52px;
+    font-size: 12px;
+    max-width: 300px;
+    max-height: 15px;
+    margin: 379px auto 0 auto;
+  }
+  
+  .profile__logout {
+    line-height: 14.52px;
+    font-size: 13px;
+    max-width: 300px;
+    max-height: 15px;
+    margin: 16px auto 0 auto;
+  }
+}
+
+@media screen and (max-width: 320px) {
+  .profile {
+    max-width: 320px;
+  }
+}
