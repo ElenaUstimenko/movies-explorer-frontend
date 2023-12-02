@@ -1,9 +1,9 @@
 import './App.css';
 import { Route, Routes } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ProtectedRoute } from '../ProtectedRoute/ProtectedRoute.js';
 import { CurrentUserContext } from "../../contexts/CurrentUserContext.js";
-import { MoviesApi } from "../../utils/MoviesApi.js";
+import MoviesApi from "../../utils/MoviesApi.js";
 import MainApi from "../../utils/MainApi.js";
 import {MOVIES_API_SETTINGS } from '../../utils/constants.js';
 
@@ -22,29 +22,27 @@ import { Navigation } from '../Navigation/Navigation.js';
 function App() {
   const [currentUser, setCurrentUser] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const [burgerMenuActive, setBurgerMenuActive] = useState(false);
   const [moviesCards, setMoviesCards] = useState([]);
   const [filters, setFilters] = useState({});
-  const [countCards, setCountCards] = useState(window.screen.width > 768 ? 12 : window.screen.width > 400 ? 8 : 5);
+  const [countCards, setCountCards] = useState(window.screen.width > 768 ? 12 : window.screen.width > 425 ? 8 : 5);
+  const [currentViewportWidth, setCurrentViewportWidth] = useState(window.screen.width);
+
+  // рассчитывает количество колонок при изменении размеров экрана
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.screen.width !== currentViewportWidth) {
+        setCountCards(window.screen.width > 768 ? 12 : window.screen.width > 425 ? 8 : 5);
+        setCurrentViewportWidth(window.screen.width);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [currentViewportWidth]);
 
   // получение всех фильмов
-  // фильтр
-  const getFilteredMovies = (movies, { text = "", short = false }) => {
-    return movies.filter(item => {
-      if (short && item.duration > 40) {
-        return false;
-      }
-      for (let key in item) {
-        if (item.hasOwnProperty(key) && typeof item[key] === "string" &&
-          item[key].toLowerCase().includes(text.toLowerCase())) {
-          return true;
-        }
-      }
-      return false;
-    });
-  };
-
-  // получение
   const getAllMovies = () => {
     setIsLoading(true);
     MoviesApi.getMovies()
@@ -83,19 +81,35 @@ function App() {
       });
   }; 
 
-  // фильтрация всех фильмов
-  const handleFilterAllMovies = (filters) => {
+   // фильтрация всех фильмов
+   const handleFilterAllMovies = (filters) => {
     if (localStorage.getItem("allMovies")) {
       setIsLoading(true);
       const filteredMovies = getFilteredMovies(JSON.parse(localStorage.getItem("allMovies")), filters) || [];
       setMoviesCards(filteredMovies);
       setIsLoading(false);
     } else {
-      getAllMovies("");
+      getAllMovies('');
     }
   };
 
-  // обработчик изменения фильтров
+  // получение фильмов после фильтра
+  const getFilteredMovies = (movies, { text = '', short = false }) => {
+    return movies.filter(item => {
+      if (short && item.duration > 40) {
+        return false;
+      }
+      for (let key in item) {
+        if (item.hasOwnProperty(key) && typeof item[key] === "string" &&
+          item[key].toLowerCase().includes(text.toLowerCase())) {
+          return true;
+        }
+      }
+      return false;
+    });
+  };
+
+  // поиск фильмов по слову, их фильтр
   const handleChangeFilters = ({ key, value }) => {
     setFilters(prev => {
       handleFilterAllMovies({ ...prev, [key]: value });
@@ -103,7 +117,7 @@ function App() {
     });
   };
 
-  // обработчик добавления новых фильмов в список
+  // добавление новых фильмов в список
   const handleIncCountOfCards = () => {
     setCountCards(prev => {
         return prev + (window.screen.width > 768 ? 3 : 2);
@@ -116,7 +130,15 @@ function App() {
     <div className="page">
       <Routes>
         <Route path='/' element={<Main />} />
-        <Route path='/movies' element={<Movies />} />
+        <Route path='/movies' element={
+          <Movies 
+            onChangeFilters={handleChangeFilters}
+            moviesCards={moviesCards}
+            countCards={countCards}
+            onIncCountOfCards={handleIncCountOfCards}
+            />} 
+          />
+
         <Route path='/saved-movies' element={<SavedMovies />} />
         <Route path='/profile' element={<Profile />} />
         <Route path='/signup' element={<Register />} />

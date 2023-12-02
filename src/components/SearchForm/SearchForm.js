@@ -1,15 +1,15 @@
-import React from 'react';
-import { useState } from "react";
+import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
 import './SearchForm.css';
 import icon from '../../images/search_icon.svg';
 import { FilterCheckbox } from '../FilterCheckbox/FilterCheckbox';
 import useWindowDimensions from "../../hooks/useWindowDimensions.js";
 
-function SearchForm({ onChangeFilters }) {
-
-  const isMobileWidth = useWindowDimensions() <= 525;
+function SearchForm({ onChangeFilters, handleChangeFilter }) {
 
   // лупу видно только на разрешении > 525px
+  const isMobileWidth = useWindowDimensions() <= 525;
+
   function renderSearchForm() {
     if (!isMobileWidth) {
       return (
@@ -22,22 +22,28 @@ function SearchForm({ onChangeFilters }) {
     }
   };
 
-  // валидация на submit кнопки найти
+   // ввод текста в search-form
+   const [searchText, setSearchText] = useState('');
+
+   const handleChangeSearchText = (evt) => {
+     setSearchText(evt.target.value);
+     setIsSearchFormValid(true);
+   };
+
+  // submit + валидация
   const [isSearchFormValid, setIsSearchFormValid] = useState(true);
 
-
-  const [searchText, setSearchText] = useState("");
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = (evt) => {
+    evt.preventDefault();
     onChangeFilters({
       key: "text",
       value: searchText,
     });
-  };
-
-  const handleChangeSearchText = (e) => {
-    setSearchText(e.target.value);
+    if(!evt.target.value) {
+      setIsSearchFormValid(false);
+    } else {
+      setIsSearchFormValid(true);
+    }
   };
 
   return (
@@ -50,22 +56,28 @@ function SearchForm({ onChangeFilters }) {
 
             {renderSearchForm()}
 
-            <input id="search-form-input" type="text" name="movie"
+            <input id="search-form-input" 
+              type="text" 
+              name="search"
               className="search-form__input"
-              placeholder="Фильм" minLength={2} maxLength={30} required
+              placeholder="Фильм" 
+              minLength={2} maxLength={30} 
+              required
               value={searchText}
-              onChange={handleChangeSearchText}
+              onChange={handleChangeSearchText} 
             />
             <span className="search-form__input-error"/>
           </label>  
           <button name="button" type="submit" 
             className="button search-form__button">Найти</button>
+            
             <span
-            className={`error${(!isSearchFormValid && " error_visible") || ""}`}
+              className={`error${(!isSearchFormValid && " error_visible") || ""}`}
             >Нужно ввести ключевое слово
             </span>
+            
         </form>
-        <FilterCheckbox />
+        <FilterCheckbox onChange={handleChangeFilter} />
       </div>
     </section>
   );

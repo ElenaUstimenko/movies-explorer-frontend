@@ -1,23 +1,45 @@
 import './MoviesCard.css';
 import { Link, useLocation } from 'react-router-dom';
-import movie from '../../images/картинка.webp';
 
-function MoviesCard() {
+function MoviesCard({ data, saved, onSaveMovieCard, onDeleteMovieCard }) {
   const { pathname } = useLocation();
   
+  const { image, trailer, nameRU, duration, movieId} = data;
+
+  const handleClick = () => {
+    if (!saved) {
+      onSaveMovieCard(data);
+    } else {
+      onDeleteMovieCard(movieId);
+    }
+  };
+
+  // корректное отображение длительности фильма
+  function countTime(duration) {
+    const time = duration / 60;
+    const hours = Math.floor(time);
+    const minutes = duration - hours * 60;
+
+    if (hours && minutes) return `${hours}ч ${minutes}м`;
+    return hours ? `${hours}ч` : `${minutes}м`;
+  }
+
   return (
     <li className="movies-card">
-      <Link to='' target='_blank'>
+      <a href={trailer} 
+        target="_blank"
+        rel="noreferrer">
         <img
           className="movies-card__picture"
-          src={movie}
-          alt={`постер фильма ${movie.title}`}
+          src={image ? image : "#"}
+          alt={`постер фильма ${nameRU}`}
         />
-      </Link>
+      </a>
       <div className="movies-card__name">
-        <h6 className="movies-card__title">Movie`s name</h6>
+        <h6 className="movies-card__title">{nameRU}</h6>
         {(pathname ==='/movies') && (
           <button 
+          onClick={handleClick}
           name="button" type="submit" 
           className="movies-card__dislike movies-card__button"
           >
@@ -25,14 +47,14 @@ function MoviesCard() {
         )}
         {(pathname ==='/saved-movies') && (
           <button 
+          onClick={handleClick}
           name="button" type="submit"
           className="movies-card__delete movies-card__button"
           >
           </button>
         )}
       </div>
-      <p className="movies-card__time">1ч 42м</p>
-     
+      <p className="movies-card__time">{countTime(duration)}</p> 
     </li>
   );
 }

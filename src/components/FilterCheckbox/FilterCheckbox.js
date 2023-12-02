@@ -3,12 +3,11 @@ import './FilterCheckbox.css';
 import sortButtonOn from '../../images/button/checkbox_on.svg';
 import sortButtonOff from '../../images/button/checkbox_off.svg';
 
-function FilterCheckbox() {
-
-  const [isSorted, setIsSorted] = useState(false);
-  const [isChecked, setIsChecked] = useState(false);
-
+function FilterCheckbox({ onChangeFilters }) {
+  
   // изменение внешнего вида чекбокса
+  const [isSorted, setIsSorted] = useState(false);
+
   const handleSortClick = () =>{
     if(!isSorted) {
       setIsSorted(true);
@@ -17,37 +16,50 @@ function FilterCheckbox() {
     }
   };
   
-  /*const handleChangeFilter = (e) => {
+  // сортировка
+  const handleChangeFilter = (e) => {
     onChangeFilters({
       key: e.target.name,
       value: e.target.type === "checkbox" ? e.target.checked : e.target.value,
     });
-  };*/
+  };
 
   return (
-    <div className="filter-checkbox">
-      <button name="button" type="button" 
+    <label className="filter-checkbox">
+      <input 
+        name="checkbox"
+        type="checkbox"
         className="filter-checkbox__button"
-        checked={isChecked} 
-        onClick={() => setIsChecked(isChecked)}>
+        onChange={handleChangeFilter}/>
       <img  
         className="filter-checkbox__image"
         src={isSorted ? sortButtonOn : sortButtonOff} 
         alt='кнопка сортировки' 
         onClick={handleSortClick}
       />
-      </button>
       <p className="filter-checkbox__type">Короткометражки</p>
-    </div>
+    </label>
   );
 }
 
 export { FilterCheckbox };
-/*<label>
-          <input
-            name="short"
-            type="checkbox"
-            className="search__filter"
-            onChange={handleChangeFilter}/>
-          <span className="search__visible-filter"/>
-        </label>*/
+
+        /*const [isChecked, setIsChecked] = useState(false);
+
+        return (
+          <div className="filter-checkbox">
+            <button name="button" type="button" 
+              className="filter-checkbox__button"
+              checked={isChecked} 
+              onClick={() => setIsChecked(isChecked)}>
+            <img  
+              className="filter-checkbox__image"
+              src={isSorted ? sortButtonOn : sortButtonOff} 
+              alt='кнопка сортировки' 
+              onClick={handleSortClick}
+            />
+            </button>
+            <p className="filter-checkbox__type">Короткометражки</p>
+          </div>
+        );
+      }*/
