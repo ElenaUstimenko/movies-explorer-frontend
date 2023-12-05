@@ -8,8 +8,8 @@ class MoviesApi extends Api {
 
   async getMovies() {
     const params = {
-      relativePath: "/beatfilm-movies",
-      method: "GET",
+      relativePath: '/beatfilm-movies',
+      method: 'GET',
     };
     const response = await this._getProxy(params);
     return await this._handleResponse(response);

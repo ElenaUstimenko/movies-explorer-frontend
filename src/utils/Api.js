@@ -1,11 +1,11 @@
 class Api {
-  constructor({ baseUrl, headers, credentials = "" }) {
+  constructor({ baseUrl, headers, credentials = '' }) {
     this._baseUrl = baseUrl;
     this._headers = headers;
     this._credentials = credentials;
   }
 
-  _getProxy({ relativePath, method, body = "", headers = {} }) {
+  _getProxy({ relativePath, method, body = '', headers = {} }) {
     const options = {
       method,
       headers: { ...this._headers, ...headers },

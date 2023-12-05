@@ -17,27 +17,27 @@ function FilterCheckbox({ onChangeFilters }) {
   };
   
   // сортировка
-  const handleChangeFilter = (e) => {
+  const handleChangeFilter = (evt) => {
     onChangeFilters({
-      key: e.target.name,
-      value: e.target.type === "checkbox" ? e.target.checked : e.target.value,
+      key: evt.target.name,
+      value: evt.target.type === 'checkbox' ? evt.target.checked : evt.target.value,
     });
   };
 
   return (
-    <label className="filter-checkbox">
+    <label className='filter-checkbox'>
       <input 
-        name="checkbox"
-        type="checkbox"
-        className="filter-checkbox__button"
+        name='checkbox'
+        type='checkbox'
+        className='filter-checkbox__button'
         onChange={handleChangeFilter}/>
       <img  
-        className="filter-checkbox__image"
+        className='filter-checkbox__image'
         src={isSorted ? sortButtonOn : sortButtonOff} 
         alt='кнопка сортировки' 
         onClick={handleSortClick}
       />
-      <p className="filter-checkbox__type">Короткометражки</p>
+      <p className='filter-checkbox__type'>Короткометражки</p>
     </label>
   );
 }

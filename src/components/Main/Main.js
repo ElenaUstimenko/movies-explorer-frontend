@@ -9,14 +9,14 @@ import { Footer } from '../Footer/Footer.js';
 
 function Main() {
   return (
-    <main className="main">
-      <Header />
+    <main className='main'>
+      
       <Promo />
       <AboutProject />
       <Techs />
       <AboutMe />
       <Portfolio />
-      <Footer />
+     
     </main>
   );
 }

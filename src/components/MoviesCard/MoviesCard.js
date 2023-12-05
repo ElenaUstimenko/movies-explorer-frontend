@@ -25,38 +25,49 @@ function MoviesCard({ data, saved, onSaveMovieCard, onDeleteMovieCard }) {
   }
 
   return (
-    <li className="movies-card">
+    <li className='movies-card'>
       <a href={trailer} 
-        target="_blank"
-        rel="noreferrer">
+        target='_blank'
+        rel='noreferrer'>
         <img
-          className="movies-card__picture"
+          className='movies-card__picture'
           src={image ? image : "#"}
           alt={`постер фильма ${nameRU}`}
         />
       </a>
-      <div className="movies-card__name">
-        <h6 className="movies-card__title">{nameRU}</h6>
-        {(pathname ==='/movies') && (
+      <div className='movies-card__name'>
+        <h6 className='movies-card__title'>{nameRU}</h6>
           <button 
           onClick={handleClick}
-          name="button" type="submit" 
-          className="movies-card__dislike movies-card__button"
+          name='button' type='submit'
+          className={
+            `movies-card__button 
+            ${/*saved &&*/ pathname === '/movies' && 'movies-card__like'}
+            ${/*saved &&*/ (pathname === '/movies' ? 'movies-card__dislike' : 'movies-card__delete')}`
+          }
           >
           </button>
-        )}
-        {(pathname ==='/saved-movies') && (
-          <button 
-          onClick={handleClick}
-          name="button" type="submit"
-          className="movies-card__delete movies-card__button"
-          >
-          </button>
-        )}
       </div>
-      <p className="movies-card__time">{countTime(duration)}</p> 
+      <p className='movies-card__time'>{countTime(duration)}</p> 
     </li>
   );
 }
 
 export { MoviesCard };
+
+/*{(pathname ==='/movies') && (
+  <button 
+  onClick={handleClick}
+  name="button" type="submit" 
+  className="movies-card__dislike movies-card__button"
+  >
+  </button>
+)}
+{(pathname ==='/saved-movies') && (
+  <button 
+  onClick={handleClick}
+  name="button" type="submit"
+  className="movies-card__delete movies-card__button"
+  >
+  </button>
+)}*/
