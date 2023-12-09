@@ -1,7 +1,78 @@
-import { Api } from "./Api.js";
-import { MAIN_API_SETTINGS } from "./constants";
+//export const baseURL = 'http://localhost:3000';
+export const baseURL = 'https://api.diplommovies.nomoredomainsmonster.ru';
 
-class MainApi extends Api {
+export const register = ({ name, email, password }) => {
+  return fetch(`${baseURL}/signup`, {
+    method: "POST",
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ name, email, password })
+  }).then(handleResponse);
+ };
+
+export const login = ({ name, email, password }) => {
+  return fetch(`${baseURL}/signin`, {
+    method: "POST",
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ name, email, password })
+  })
+  .then(handleResponse);
+ };
+
+export const checkToken = () => {
+  return fetch(`${baseURL}/users/me`, {
+    method: "GET",
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
+    },
+  }).then(handleResponse);
+};
+
+// загрузка инфо о пользователе с сервера
+export const getUserIDInfo = () => {
+  return fetch(`${baseURL}/users/me`, {
+    method: "GET",
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
+    },
+  }).then(handleResponse)
+  };
+
+// редактирование профиля
+export const userInformation = ({ name, email }) => {
+  return fetch(`${baseURL}/users/me`, {
+    method: "PATCH",
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
+    },   
+    body: JSON.stringify({
+      name: name,
+      email: email,
+    })
+  }).then(handleResponse)
+};
+
+
+const handleResponse = (res) => {
+  if (res.ok) {
+    return res.json() // возвращает promise 
+  } else {
+    return Promise.reject(`Ошибка: ${res.status}`) // если ошибка, отклоняет promise 
+  }
+};
+
+/*class MainApi extends Api {
   constructor({ baseUrl, headers, credentials }) {
     super({ baseUrl, headers, credentials });
   }
@@ -68,6 +139,10 @@ class MainApi extends Api {
     return await this._handleResponse(response);
   }
 
+ 
+
+
+
   async signIn({ password, email }) {
     const params = {
       relativePath: '/signin',
@@ -87,7 +162,7 @@ class MainApi extends Api {
     return await this._handleResponse(response);
   }
 
-  async getUserData() {
+  async getUserInfo() {
     const params = {
       relativePath: '/users/me',
       method: 'GET',
@@ -96,7 +171,7 @@ class MainApi extends Api {
     return await this._handleResponse(response);
   }
 
-  async setUserData({ name, email }) {
+  async setUserInfo({ name, email }) {
     const params = {
       relativePath: '/users/me',
       method: 'PATCH',
@@ -107,4 +182,4 @@ class MainApi extends Api {
   }
 }
 
-export default new MainApi(MAIN_API_SETTINGS);
+export default new MainApi(MAIN_API_SETTINGS);*/

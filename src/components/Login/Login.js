@@ -1,23 +1,47 @@
 import './Login.css';
 import '../Register/Register.css'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import logo from '../../images/logo/logo-smile.svg'
 import { useEffect, useState } from 'react';
+//import useFormValidation from '../../hooks/useFormValidation.js';
 
-function Login() {
+import {
+  PATTERN_NAME,
+  PATTERN_EMAIL,
+  PATTERN_PASSWORD,
+} from "../../utils/constants.js";
+import { VALIDATION_MESSAGES } from "../../utils/validation.js";
+
+
+function Login(props) {
+
+  const { onLogin } = props;
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  
+
+  const navigate = useNavigate();
+
+  const handleSubmit = (evt) => {
+    evt.preventDefault();
+
+    if (!password || !email) { // проверка почты и пароля 
+      return;
+    }
+    onLogin({ email, password }) // сюда попадают данные из инпутов
+  };
+
+  /*const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [emailFilled, setEmailFilled] = useState(false);
   const [passwordFilled, setPasswordFilled] = useState(false);
 
   const [emailError, setEmailError] = useState('Поле email не может быть пустым');
   const [passwordError, setPasswordError] = useState('Поле пароль не может быть пустым');
 
-  const [formValid, setFormValid] = useState(false);
+  const [formValid, setFormValid] = useState(false);*/
 
-  useEffect (() => {
+ /* useEffect (() => {
     if (emailError || passwordError) {
       setFormValid(false)
     } else {
@@ -60,7 +84,7 @@ function Login() {
     } else {
       setPasswordError('');
     }
-  }
+  }*/
 
   return (
     <section className='register login'>
@@ -73,38 +97,52 @@ function Login() {
           />
         </Link>
         <h3 className='register__title'>Рады видеть!</h3>
-        <form action='#' name='register' className='register__form'
+        <form action='#' 
+          name='register' 
+          className='register__form'
           noValidate
-          // onSubmit={handleSubmit}
+          onSubmit={handleSubmit}
         >
           <label className='register__field'>
             <h6 className='register__discription'>E-mail</h6>
-            <input id='login-input-email' type='email' name='email'
+            <input 
+              id='login-input-email' 
+              type='email' 
+              name='email'
               className='register__input_type_email register__input'
-              placeholder='E-mail' minLength={2} maxLength={30} required
+              placeholder='E-mail' 
+              minLength={2} 
+              maxLength={30} 
+              required
               value={email} 
-              onBlur={evt => clearHandler(evt)}
-              onChange={evt => emailHandler(evt)}
+              onChange={({target: {value}}) => setEmail(value)}
+              //onBlur={evt => clearHandler(evt)}
+              //onChange={evt => emailHandler(evt)}
             />
-            {(emailFilled && emailError) && <div className='register__input-error'>{emailError}</div>}
+            {/*(emailFilled && emailError) && <div className='register__input-error'>{emailError}</div>*/}
 
           </label>
           <label className='register__field'>
             <h6 className='register__discription'>Пароль</h6>
-            <input id='password-login-input' name='password'
+            <input 
+              id='password-login-input' 
+              name='password'
               className='register__input_type_password register__input'
-              placeholder='Пароль' type='password' required
+              placeholder='Пароль' 
+              type='password' 
+              required
               value={password} 
-              onBlur={evt => clearHandler(evt)}
-              onChange={evt => passwordHandler(evt)}
+              onChange={({target: {value}}) => setPassword(value)}
+              //onBlur={evt => clearHandler(evt)}
+              //onChange={evt => passwordHandler(evt)}
             />
-            {(passwordFilled && passwordError) && <div className='register__input-error'>{passwordError}</div>}
+            {/*(passwordFilled && passwordError) && <div className='register__input-error'>{passwordError}</div>*/}
            
           </label> 
           <button 
             name='button' 
             type='submit'
-            disabled={!formValid}
+            //disabled={!formValid}
             className='register__button login__button'>Войти</button>
           <div className='login__register'>
             

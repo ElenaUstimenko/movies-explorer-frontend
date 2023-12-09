@@ -1,12 +1,21 @@
 import './App.css';
-import { Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { ProtectedRoute } from '../ProtectedRoute/ProtectedRoute.js';
+import { Route, Routes, useNavigate, useLocation } from 'react-router-dom';
+import { ProtectedRouteElement } from '../ProtectedRoute/ProtectedRoute.js';
 import { CurrentUserContext } from "../../contexts/CurrentUserContext.js";
 
 import MoviesApi from "../../utils/MoviesApi.js";
-import MainApi from "../../utils/MainApi.js";
 import {MOVIES_API_SETTINGS } from '../../utils/constants.js';
+//import MainApi from "../../utils/MainApi.js";
+import { 
+  register, 
+  login, 
+  checkToken, 
+  getUserIDInfo, 
+  userInformation 
+} from '../../utils/MainApi.js';
+
+//import setUserInfo from '../../utils/MainApi.js'
 
 import { Header } from '../Header/Header.js';
 import { Main } from '../Main/Main.js';
@@ -19,35 +28,177 @@ import { Login } from '../Login/Login.js';
 import { NotFound } from '../NotFound/NotFound.js';
 import { InfoPopup } from '../InfoPopup/InfoPopup.js';
 import { Preloader } from '../Preloader/Preloader.js';
-import { Navigation } from '../Navigation/Navigation.js';
+
+import {
+  VALIDATION_MESSAGES,
+  showDefaultError,
+} from '../../utils/validation.js';
+
 
 function App() {
-  const [isLoading, setIsLoading] = useState(false);
 
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [currentUser, setCurrentUser] = useState({});
+  const [isLoading, setIsLoading] = useState(false); // процесс загрузки данных
+  const [loggedIn, setLoggedIn] = useState(false); // хранение состояния авторизации
   const [usersMoviesCards, setUsersMoviesCards] = useState([]);
-
-  const [firstPath, setFirstPath] = useState('/');
+  //const [firstPath, setFirstPath] = useState('/');
   const [infoPopup, setInfoPopup] = useState('');
+  const [successMessages, setSuccessMessages] = useState('');
+  const [error, setError] = useState({});
+  const [errorMessages, setErrorMessages] = useState({
+    registrationResponse: '',
+    authorizationResponse: '',
+    updatingUserInfoResponse: '',
+    moviesResponse: '',
+  });
   
+  const [isButtonSaveVisible, setIsButtonSaveVisible] = useState(false); // появление кнопки Сохранить
+
   const [moviesCards, setMoviesCards] = useState([]);
   const [filters, setFilters] = useState({});
   const [countCards, setCountCards] = useState(window.screen.width > 768 ? 12 : window.screen.width > 425 ? 8 : 5);
   const [currentViewportWidth, setCurrentViewportWidth] = useState(window.screen.width);
   
-  const [error, setError] = useState({});
   
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
+  /*useEffect (() => {
+    const token = localStorage.getItem('jwt');
+    if (token) {
+      api.getAppInfo()
+      .then(([cards, currentUser]) => {
+          setCards(cards);
+          setCurrentUser({
+            name: currentUser.name,
+            about: currentUser.about,
+            avatar: currentUser.avatar,
+            _id: currentUser._id,
+            email: currentUser.email,
+          })
+      }).catch(console.error)
+    }
+  }, [loggedIn]);*/
+
+  // ПОЛЬЗОВАТЕЛЬ
+  // регистрация
+  const handleRegister = ({ name, email, password }) => {
+    setIsLoading(true);
+    console.log(password);
+    console.log(email);
+    console.log(name);
+    return register({ name, email, password })
+    .then((res) => { 
+
+      if (res) {
+        console.log(res);
+        setLoggedIn(true);
+        setCurrentUser(res);
+        navigate('/signin')
+      }
+    }).catch(({ status, message }) => {
+      setError({ status, message });
+      navigate('/signup')
+    }).finally(() => {
+      // setInfoPopup({ message });
+      setIsLoading(false);
+    })
+  };
+
+  // авторизация
+  const handleLogin = ({ email, password }) => {
+    console.log(password);
+    console.log(email);
+    setIsLoading(true);
+    return login({ email, password })
+    .then((res) => {
+      console.log(res)
+      
+      if (res.jwt) {
+        setLoggedIn(true);
+        localStorage.setItem('jwt', res.jwt)
+        console.log(localStorage.getItem('jwt'))
+        navigate('/movies')
+        setCurrentUser(res);
+      }
+    }).catch(({ status, message }) => {
+      setError({ status, message });
+      navigate('/signup');
+    }).finally(() => {
+      setIsLoading(false);
+      //setInfoPopup({ message });
+    });
+  };
+
+  // вызывается при монтировании и отправляет запрос checkToken если jwt есть в хранилище
+  useEffect (() => {
+    const token = localStorage.getItem('jwt');
+      if(token) {
+        checkToken(token)
+        .then((res) => {
+          if(res) {
+            setLoggedIn(true);
+            navigate('/movies');
+            // console.log(res)
+          } else {
+            navigate('/signin');
+          }
+        }).catch(({ status, message }) => {
+            setError({ status, message });
+          })
+          }
+  }, []);
+
+  // стейт, отвечающий за данные пользователя
+  const [currentUser, setCurrentUser] = useState({});
+
+  // вызывается при монтировании компонента 
+  // совершает запрос в API за пользовательскими данными
+  useEffect(() => {
+    const token = localStorage.getItem('jwt');
+    if(token) {
+      getUserIDInfo()
+      .then((currentUser) => {
+      //console.log(currentUser);
+      // user information - обновление стейт переменной из получ.значения
+        setCurrentUser({
+          name: currentUser.name,
+          email: currentUser.email,
+          //_id: currentUser._id,
+      })
+    }).catch(({ status, message }) => {
+      setError({ status, message });
+    })
+    }
+  }, []);
+
+  // после завершения запроса обновляем стейт currentUser из полученных данных 
+  const handleUpdateUser = ({ name, email }) => {
+  setIsLoading(true);
+  userInformation({ name, email })
+  .then((newProfile) => {
+    setCurrentUser(newProfile)
+    }).catch(({ status, message }) => {
+      setError({ status, message });
+    }).finally(() => {
+      setIsLoading(false);
+      //setInfoPopup({ message });
+    });
+  };
+
+  const handleSignout = (res) => {
+    setLoggedIn(false);
+    localStorage.removeItem('jwt');
+    navigate('/signin');
+  };
+  
+
    // фильмы //
   // проверка авторизации пользователя при монтировании, достаём из временного хранилища фильмы
-  useEffect(() => {
+  /*useEffect(() => {
     setFirstPath(pathname);
     setIsLoading(true);
     MainApi
-      .getUserData()
+      .getUserInfo()
       .then((data) => {
         setLoggedIn(true);
         setCurrentUser(data);
@@ -60,7 +211,7 @@ function App() {
     if (localStorage.getItem('allMovies')) {
       setMoviesCards(JSON.parse(localStorage.getItem('allMovies')));
     }
-  }, []);
+  }, []);*/
 
   // рассчитывает количество колонок при изменении размеров экрана
   useEffect(() => {
@@ -260,46 +411,10 @@ function App() {
     }).catch(console.error)
   };*/
 
-  // пользователь
-  // регистрация
-  const handleRegistration = (data) => {
-    setIsLoading(true);
-    MainApi.signUp(data)
-      .then((res) => {
-        setLoggedIn(true);
-        setCurrentUser(res);
-        navigate('/movies');
-      })
-      .catch(({ status, message }) => {
-        setError({ status, message });
-        navigate('*');
-      },
-      )
-      .finally(() => {
-        setIsLoading(false);
-      });
-  };
-  // авторизация
-  const handleAuthorization = (data) => {
-    setIsLoading(true);
-    MainApi.signIn(data)
-      .then((res) => {
-        setLoggedIn(true);
-        setCurrentUser(res);
-        navigate('/movies');
-      })
-      .catch(({ status, message }) => {
-        setError({ status, message });
-        navigate('*');
-      },
-      )
-      .finally(() => {
-        setIsLoading(false);
-      });
-  };
+  
 
   // получение списка фильмов пользователя при авторизации
-  useEffect(() => {
+  /*useEffect(() => {
     if (loggedIn) {
       setIsLoading(true);
       MainApi.getMoviesList()
@@ -311,10 +426,10 @@ function App() {
           setIsLoading(false);
         });
     }
-  }, [loggedIn]);
+  }, [loggedIn]);*/
 
   // обновление данных пользователя
-  const handleUpdateUser = (data) => {
+  /*const handleUpdateUser = (data) => {
     setIsLoading(true);
     MainApi.setUserData(data)
       .then((res) => {
@@ -328,10 +443,47 @@ function App() {
       .finally(() => {
         setIsLoading(false);
       });
-  };
+  };*/
+
+  /*async function updateUserInfo({ email, name }) {
+    if (email === currentUser.email && name === currentUser.name) {
+      return;
+    } else {
+      setIsLoading(true);
+
+      try {
+        const res = await setUserInfo(email, name);
+        if (res.ok) {
+          setErrorMessages({ updatingUserInfoResponse: '' });
+          setIsButtonSaveVisible(false);
+          setSuccessMessages({
+            updatingUserInfoResponse: 'Данные профиля успешно обновлены',
+          });
+
+          const data = await res.json();
+          setCurrentUser(data);
+        } else {
+          setErrorMessages({
+            updatingUserInfoResponse:
+              res.status === 500
+                ? VALIDATION_MESSAGES.backend[500]
+                : res.status === 409
+                ? VALIDATION_MESSAGES.backend[409]
+                : showDefaultError('обновлении профиля'),
+          });
+        }
+      } catch (err) {
+        console.error(
+          `Ошибка в процессе редактирования данных пользователя: ${err}`
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };*/
 
   // выход
-  const handleSignout = () => {
+  /*const handleSignout = () => {
     setIsLoading(true);
     MainApi.signOut()
       .then(() => {
@@ -350,7 +502,7 @@ function App() {
 
   const handleSubmitInfoPopup = () => {
     setInfoPopup('');
-  };
+  };*/
 
   return (
     <CurrentUserContext.Provider value={{ ...currentUser }}>
@@ -368,7 +520,7 @@ function App() {
           onIncCountOfCards={handleIncCountOfCards}
           //onSaveMovieCard={handleSaveMovieCard}
           //onDeleteMovieCard={handleDeleteMovieCard}
-          usersMoviesCards={usersMoviesCards} />} 
+          usersMoviesCards={usersMoviesCards} />}
         />
   
         <Route path='/saved-movies' element={<SavedMovies 
@@ -381,15 +533,32 @@ function App() {
           usersMoviesCards={usersMoviesCards} />} 
         />
 
-        <Route path='/profile' element={<Profile onSignOut={handleSignout} onUpdateUser={handleUpdateUser}/>} />
-        <Route path='/signup' element={<Register onRegistration={handleRegistration}/>} />
-        <Route path='/signin' element={<Login onAuthorization={handleAuthorization}/>} />
+        <Route path='/profile' element={
+        <Profile 
+          loggedIn={loggedIn}
+          setCurrentUser={setCurrentUser}
+          onUpdateUser={handleUpdateUser}
+          isLoading={isLoading}
+          onSignOut={handleSignout}
+
+          //onUpdate={updateUserInfo}
+          isButtonSaveVisible={isButtonSaveVisible}
+          setIsButtonSaveVisible={setIsButtonSaveVisible}
+          //onLoad={isLoading}
+          onSuccessMessages={successMessages}
+          setSuccessMessages={setSuccessMessages}
+          error={errorMessages}
+          setErrorMessages={setErrorMessages}
+        />} />
+
+        <Route path='/signup' element={<Register onRegister={handleRegister}/>} />
+        <Route path='/signin' element={<Login onLogin={handleLogin}/>} />
         <Route path='*' element={<NotFound />} />
       </Routes>
       <Footer />
       {isLoading && <Preloader/>}
 
-      <InfoPopup message={infoPopup} onSubmit={handleSubmitInfoPopup}/>
+      <InfoPopup message={infoPopup} /*onSubmit={}*//>
       
     </div>
     </CurrentUserContext.Provider>
@@ -398,13 +567,14 @@ function App() {
 
 export { App };
 
-/*<Route path='/movies' element={
+/*
   <ProtectedRoute
-    element={Movies}
+    path='/movies'
+    component={Movies}
     onChangeFilters={handleChangeFilters}
     moviesCards={moviesCards}
     countCards={countCards}
     onIncCountOfCards={handleIncCountOfCards}
     onSaveMovieCard={handleSaveMovieCard}
     onDeleteMovieCard={handleDeleteMovieCard} />} 
-  />*/
+ */

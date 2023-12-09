@@ -25,8 +25,7 @@ function Navigation({ active, setActive, burgerMenuActive, setBurgerMenuActive }
           className={({ isActive }) =>
             `link navigation__link${(isActive && ' navigation__link_active') || ''}`
           }
-          to={path}
-        >
+          to={path}>
           {label}
         </NavLink>
       </li>

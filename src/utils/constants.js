@@ -1,6 +1,6 @@
-export const URL_BASE_LOCAL = 'http://localhost:3000';
+/*export const URL_BASE_LOCAL = 'http://localhost:3000';
 export const URL_BASE = 'https://api.nomoreparties.co';
-//export const URL_MOVIES = ;
+//export const URL_MOVIES = ;*/
 
 export const MOVIES_API_SETTINGS = {
   baseUrl: 'https://api.nomoreparties.co',
@@ -18,7 +18,22 @@ export const MAIN_API_SETTINGS = {
   credentials: 'include',
 };
 
-export const PROPS_REGISTRATIONS = {
+
+export const PATTERN_NAME = '[A-я-\\s]{2,30}';
+
+export const PATTERN_EMAIL =
+  '/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/';
+
+export const PATTERN_PASSWORD =
+  '(?=.*[A-z])(?=.*\\d)(?=.*[!@#$%^&*])(?=.{8,}).*';
+
+
+ 
+  
+
+
+
+/*export const PROPS_REGISTRATIONS = {
   inputsList: [
     { name: 'name', label: 'Имя', type: 'text', maxLength: 30 },
     { name: 'email', label: 'E-mail', type: 'text' },
@@ -184,4 +199,4 @@ export const PROPS_PROFILE = {
       },
     },
   },
-};
+};*/
