@@ -3,19 +3,23 @@ import { useState, useEffect } from 'react';
 import { Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import { ProtectedRouteElement } from '../ProtectedRoute/ProtectedRoute.js';
 import { CurrentUserContext } from "../../contexts/CurrentUserContext.js";
+import useValidation from '../../hooks/useValidation.js';
 
-import MoviesApi from "../../utils/MoviesApi.js";
-import {MOVIES_API_SETTINGS } from '../../utils/constants.js';
-//import MainApi from "../../utils/MainApi.js";
+//import { mainApi } from '../../utils/MainApi.js';
+import { moviesApi } from '../../utils/MoviesApi.js';
+import { MOVIES_API_SETTINGS } from '../../utils/constants.js';
+
 import { 
   register, 
   login, 
   checkToken, 
   getUserIDInfo, 
-  userInformation 
+  userInformation,
+  getAllContent,
+  getSavedMovies,
+  saveCard,
+  deleteCard,
 } from '../../utils/MainApi.js';
-
-//import setUserInfo from '../../utils/MainApi.js'
 
 import { Header } from '../Header/Header.js';
 import { Main } from '../Main/Main.js';
@@ -29,86 +33,106 @@ import { NotFound } from '../NotFound/NotFound.js';
 import { InfoPopup } from '../InfoPopup/InfoPopup.js';
 import { Preloader } from '../Preloader/Preloader.js';
 
-import {
-  VALIDATION_MESSAGES,
-  showDefaultError,
-} from '../../utils/validation.js';
-
-
 function App() {
 
   const [isLoading, setIsLoading] = useState(false); // процесс загрузки данных
   const [loggedIn, setLoggedIn] = useState(false); // хранение состояния авторизации
-  const [usersMoviesCards, setUsersMoviesCards] = useState([]);
-  //const [firstPath, setFirstPath] = useState('/');
-  const [infoPopup, setInfoPopup] = useState('');
-  const [successMessages, setSuccessMessages] = useState('');
-  const [error, setError] = useState({});
-  const [errorMessages, setErrorMessages] = useState({
-    registrationResponse: '',
-    authorizationResponse: '',
-    updatingUserInfoResponse: '',
-    moviesResponse: '',
-  });
+  const [isError, setIsError] = useState({}); // ошибки в инпутах
+  const [isEditing, setIsEditing] = useState(false); // режим изменения для редактирования
+  const [isSending, setIsSending] = useState(false);
   
-  const [isButtonSaveVisible, setIsButtonSaveVisible] = useState(false); // появление кнопки Сохранить
-
-  const [moviesCards, setMoviesCards] = useState([]);
-  const [filters, setFilters] = useState({});
-  const [countCards, setCountCards] = useState(window.screen.width > 768 ? 12 : window.screen.width > 425 ? 8 : 5);
   const [currentViewportWidth, setCurrentViewportWidth] = useState(window.screen.width);
+  const [countCards, setCountCards] = useState(window.screen.width > 768 ? 12 : window.screen.width > 425 ? 8 : 5);
   
+  const[savedCards, setSavedCards] = useState([]);
+
+  //const [usersMoviesCards, setUsersMoviesCards] = useState([]);
+  //const [moviesCards, setMoviesCards] = useState([]);
+  //const [filters, setFilters] = useState({});
   
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  /*useEffect (() => {
+  // INFO POPUP
+  const [infoPopup, setInfoPopup] = useState(false);
+  const [infoPopupText, setInfoPopupText] = useState('');
+
+  const closeInfoPopup = () => {
+    setInfoPopup(false);
+  };
+
+  // FOR FIRST LOADING
+  useEffect(() => {
+    handleTokenCheck();
+  }, []);
+
+  const handleTokenCheck = () => {
     const token = localStorage.getItem('jwt');
-    if (token) {
-      api.getAppInfo()
-      .then(([cards, currentUser]) => {
-          setCards(cards);
-          setCurrentUser({
-            name: currentUser.name,
-            about: currentUser.about,
-            avatar: currentUser.avatar,
-            _id: currentUser._id,
-            email: currentUser.email,
-          })
-      }).catch(console.error)
-    }
-  }, [loggedIn]);*/
+    if (token){
+      return getAllContent(token)
+      .then((res) => {
+        setLoggedIn(true);
+      })
+      .catch(error => {
+        console.log(error);
+      })
+    } 
+  };
 
-  // ПОЛЬЗОВАТЕЛЬ
+  useEffect(() => {
+    if(loggedIn) {
+      const token = localStorage.getItem('jwt');
+      Promise.all([ getAllContent(token), getSavedMovies(token)])
+        .then(([userInfo, movies]) => {
+          setCurrentUser(userInfo);
+          setSavedCards(movies);
+        })
+        .catch((error) => console.log(`Ошибка получения данных ${error}`));
+      }
+  }, [loggedIn]);
+
+  // USER
+  const { errors, isValid, handleChange, resetForm, formValue } = useValidation();
+
   // регистрация
-  const handleRegister = ({ name, email, password }) => {
+  function handleRegister({ name, email, password }) {
     setIsLoading(true);
-    console.log(password);
-    console.log(email);
-    console.log(name);
-    return register({ name, email, password })
-    .then((res) => { 
 
+    return register({ name, email, password })
+    .then((res) => {
       if (res) {
         console.log(res);
         setLoggedIn(true);
         setCurrentUser(res);
-        navigate('/signin')
+        handleLogin({ email, password });
+        navigate('/signin');
+        setInfoPopup(true);
+        setInfoPopupText('Вы успешно зарегистрировались!');
       }
-    }).catch(({ status, message }) => {
-      setError({ status, message });
+    }).catch(error => {
       navigate('/signup')
-    }).finally(() => {
-      // setInfoPopup({ message });
+      
+      if (error === 409) {
+        setInfoPopup(true);
+        setInfoPopupText('Пользователь с таким email уже существует.')   
+      } else if (error === 500) {
+        setInfoPopup(true);
+        setInfoPopupText('На сервере произошла ошибка.');
+      } else {
+        setInfoPopup(true);
+        setInfoPopupText('Что-то пошло не так! Попробуйте ещё раз.');
+        console.log(error)
+      }
+    })
+    .finally(() => {
       setIsLoading(false);
     })
   };
 
   // авторизация
   const handleLogin = ({ email, password }) => {
-    console.log(password);
-    console.log(email);
     setIsLoading(true);
+
     return login({ email, password })
     .then((res) => {
       console.log(res)
@@ -119,13 +143,23 @@ function App() {
         console.log(localStorage.getItem('jwt'))
         navigate('/movies')
         setCurrentUser(res);
+        setInfoPopup(true);
+        setInfoPopupText('Вы успешно вошли!');
       }
-    }).catch(({ status, message }) => {
-      setError({ status, message });
+    }).catch(error => {
       navigate('/signup');
+      if (error === 401) {
+        setInfoPopup(true);
+        setInfoPopupText('Вы ввели неправильный логин или пароль.')   
+      } else if (error === 500) {
+        setInfoPopup(true);
+        setInfoPopupText('На сервере произошла ошибка.')   
+      } else {
+        setInfoPopup(true);
+        setInfoPopupText('Что-то пошло не так! Попробуйте ещё раз.');  
+      }
     }).finally(() => {
       setIsLoading(false);
-      //setInfoPopup({ message });
     });
   };
 
@@ -138,12 +172,11 @@ function App() {
           if(res) {
             setLoggedIn(true);
             navigate('/movies');
-            // console.log(res)
           } else {
             navigate('/signin');
           }
         }).catch(({ status, message }) => {
-            setError({ status, message });
+          setIsError({ status, message });
           })
           }
   }, []);
@@ -158,61 +191,55 @@ function App() {
     if(token) {
       getUserIDInfo()
       .then((currentUser) => {
-      //console.log(currentUser);
-      // user information - обновление стейт переменной из получ.значения
         setCurrentUser({
           name: currentUser.name,
           email: currentUser.email,
-          //_id: currentUser._id,
+          _id: currentUser._id,
+        })
+      }).catch(({ status, message }) => {
+        setIsError({ status, message });
       })
-    }).catch(({ status, message }) => {
-      setError({ status, message });
-    })
     }
   }, []);
 
-  // после завершения запроса обновляем стейт currentUser из полученных данных 
+  // редактирование профиля 
   const handleUpdateUser = ({ name, email }) => {
-  setIsLoading(true);
-  userInformation({ name, email })
-  .then((newProfile) => {
-    setCurrentUser(newProfile)
-    }).catch(({ status, message }) => {
-      setError({ status, message });
+    setIsLoading(true);
+    userInformation({ name, email })
+    .then(({ name, email }) => {
+      setCurrentUser({ ...currentUser, name, email });
+      setInfoPopup(true);
+      setInfoPopupText('Данные успешно отредактированы!');
+    }).catch(error => {
+      if (error === 409) {
+        setInfoPopup(true);
+        setInfoPopupText('Пользователь с таким email уже существует.')   
+      } else if (error === 500) {
+        setInfoPopup(true);
+        setInfoPopupText('На сервере произошла ошибка.')   
+      } else {
+        setInfoPopup(true);
+        setInfoPopupText('Что-то пошло не так! Попробуйте ещё раз.');
+      }
     }).finally(() => {
       setIsLoading(false);
-      //setInfoPopup({ message });
     });
   };
 
+  // режим редактирования
+  const handleEditClick = () => {
+    setIsEditing(true);
+    setIsError(false);
+  };
+
+  // выход из профиля
   const handleSignout = (res) => {
     setLoggedIn(false);
     localStorage.removeItem('jwt');
     navigate('/signin');
   };
   
-
-   // фильмы //
-  // проверка авторизации пользователя при монтировании, достаём из временного хранилища фильмы
-  /*useEffect(() => {
-    setFirstPath(pathname);
-    setIsLoading(true);
-    MainApi
-      .getUserInfo()
-      .then((data) => {
-        setLoggedIn(true);
-        setCurrentUser(data);
-      })
-      .catch(console.log)
-      .finally(() => {
-        setIsLoading(false);
-      });
-
-    if (localStorage.getItem('allMovies')) {
-      setMoviesCards(JSON.parse(localStorage.getItem('allMovies')));
-    }
-  }, []);*/
-
+  // MOVIES
   // рассчитывает количество колонок при изменении размеров экрана
   useEffect(() => {
     const handleResize = () => {
@@ -228,12 +255,13 @@ function App() {
     };
   }, [currentViewportWidth]);
 
-  // получение всех фильмов
-  const getAllMovies = () => {
+  // получение всех фильмов, их поиск
+
+  /*const getAllMovies = () => {
     setIsLoading(true);
-    MoviesApi.getMovies()
-      .then((data) => {
-        const allMovies = data.map(({
+    moviesApi.getMovies()
+      .then((cards) => {
+        const allMovies = cards.map(({
           country,
           director,
           duration,
@@ -265,10 +293,10 @@ function App() {
       .finally(() => {
         setIsLoading(false);
       });
-  }; 
+  }; */
 
-   // фильтрация всех фильмов
-   const handleFilterAllMovies = (filters) => {
+   // фильтрация всех фильмов +
+  /* const handleFilterAllMovies = (filters) => {
     if (localStorage.getItem('allMovies')) {
       setIsLoading(true);
       const filteredMovies = getFilteredMovies(JSON.parse(localStorage.getItem('allMovies')), filters) || [];
@@ -279,7 +307,7 @@ function App() {
     }
   };
 
-  // получение фильмов после фильтра
+  // получение фильмов после фильтра +
   const getFilteredMovies = (movies, { text = '', short = false }) => {
     return movies.filter(item => {
       if (short && item.duration > 40) {
@@ -295,7 +323,7 @@ function App() {
     });
   };
 
-  // поиск фильмов по слову, их фильтр
+  // поиск фильмов по слову, их фильтр +
   const handleChangeFilters = ({ key, value }) => {
     setFilters(prev => {
       handleFilterAllMovies({ ...prev, [key]: value });
@@ -303,13 +331,13 @@ function App() {
     });
   };
 
-  // добавление новых фильмов в список
+  // добавление новых фильмов в список +
   const handleIncCountOfCards = () => {
     setCountCards(prev => {
         return prev + (window.screen.width > 768 ? 3 : 2);
       },
     );
-  };
+  };*/
 
   // лайк фильма, добавление в избранное
   /*const handleSaveMovieCard = (data) => {
@@ -409,9 +437,7 @@ function App() {
       setCards((cards) => cards.filter((c) => c._id !== cardID)); 
       // setCards((cards) => cards.filter((id) => id !== cardID));
     }).catch(console.error)
-  };*/
-
-  
+  };*/ 
 
   // получение списка фильмов пользователя при авторизации
   /*useEffect(() => {
@@ -427,138 +453,114 @@ function App() {
         });
     }
   }, [loggedIn]);*/
+  
 
-  // обновление данных пользователя
-  /*const handleUpdateUser = (data) => {
-    setIsLoading(true);
-    MainApi.setUserData(data)
-      .then((res) => {
-        setCurrentUser(res);
-        setInfoPopup('Данные изменены');
-      })
-      .catch(({ status, message }) => {
-        setError({ status, message });
-        navigate('*');
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  };*/
-
-  /*async function updateUserInfo({ email, name }) {
-    if (email === currentUser.email && name === currentUser.name) {
-      return;
+  // сохранение карточки и удаление из списка сохранённых
+  function handleSaveCard(data) {
+    const isSaved = savedCards.some(item => item.movieId === data.id)
+    const token = localStorage.getItem('jwt');
+    if(isSaved) {
+      const cardToDelete = savedCards.find((card) => card.movieId === data.id)
+      handleCardDelete(cardToDelete);
     } else {
-      setIsLoading(true);
-
-      try {
-        const res = await setUserInfo(email, name);
-        if (res.ok) {
-          setErrorMessages({ updatingUserInfoResponse: '' });
-          setIsButtonSaveVisible(false);
-          setSuccessMessages({
-            updatingUserInfoResponse: 'Данные профиля успешно обновлены',
-          });
-
-          const data = await res.json();
-          setCurrentUser(data);
-        } else {
-          setErrorMessages({
-            updatingUserInfoResponse:
-              res.status === 500
-                ? VALIDATION_MESSAGES.backend[500]
-                : res.status === 409
-                ? VALIDATION_MESSAGES.backend[409]
-                : showDefaultError('обновлении профиля'),
-          });
-        }
-      } catch (err) {
-        console.error(
-          `Ошибка в процессе редактирования данных пользователя: ${err}`
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    }
-  };*/
-
-  // выход
-  /*const handleSignout = () => {
-    setIsLoading(true);
-    MainApi.signOut()
-      .then(() => {
-        setLoggedIn(false)
-        localStorage.removeItem('jwt');
+      return saveCard(data, token)
+      .then((newCard) => {
+        setSavedCards([newCard, ...savedCards])
       })
-      .catch(({ status, message }) => {
-        setError({ status, message });
-        navigate('/signin');
-      },
-    )
-    .finally(() => {
-      setIsLoading(false);
-    });
+      .catch((error) => console.log(error))
+    }  
   };
 
-  const handleSubmitInfoPopup = () => {
-    setInfoPopup('');
-  };*/
+  function handleCardDelete(card) {
+    const token = localStorage.getItem('jwt');
+    return deleteCard(card._id, token)
+    .then(() => {
+      setSavedCards((state) => state.filter((c) => c._id !== card._id));
+    })
+    .catch((error => console.log(error)))
+  };
 
   return (
     <CurrentUserContext.Provider value={{ ...currentUser }}>
     <div className='page'>
     {(pathname === '/' || pathname === '/movies' || pathname === '/saved-movies' || pathname === '/profile') && (
-      <Header loggedIn={loggedIn}/> 
+      <Header loggedIn={loggedIn} /> 
     )}
       <Routes>
         <Route path='/' element={<Main />} />
   
         <Route path='/movies' element={<Movies
-          onChangeFilters={handleChangeFilters}
-          moviesCards={moviesCards}
+          //onChangeFilters={handleChangeFilters}
+          //moviesCards={moviesCards}
           countCards={countCards}
-          onIncCountOfCards={handleIncCountOfCards}
+          //onIncCountOfCards={handleIncCountOfCards}
           //onSaveMovieCard={handleSaveMovieCard}
           //onDeleteMovieCard={handleDeleteMovieCard}
-          usersMoviesCards={usersMoviesCards} />}
+          //usersMoviesCards={usersMoviesCards} 
+          
+          isError={isError}
+          onSave={handleSaveCard}
+          loggedIn={loggedIn}
+          isLoading={isLoading}
+          setIsError={setIsError}
+          savedCards={savedCards}
+          
+          />}
         />
   
         <Route path='/saved-movies' element={<SavedMovies 
-          onChangeFilters={handleChangeFilters}
-          moviesCards={moviesCards}
+          //onChangeFilters={handleChangeFilters}
+          //moviesCards={moviesCards}
           countCards={countCards}
-          onIncCountOfCards={handleIncCountOfCards}
+          //onIncCountOfCards={handleIncCountOfCards}
           //onSaveMovieCard={handleSaveMovieCard}
           //onDeleteMovieCard={handleDeleteMovieCard}
-          usersMoviesCards={usersMoviesCards} />} 
+          //usersMoviesCards={usersMoviesCards} 
+          
+          savedCards={savedCards}
+              onDelete={handleCardDelete}
+              isError={isError}
+              loggedIn={loggedIn}
+          />} 
         />
 
         <Route path='/profile' element={
-        <Profile 
-          loggedIn={loggedIn}
-          setCurrentUser={setCurrentUser}
-          onUpdateUser={handleUpdateUser}
-          isLoading={isLoading}
-          onSignOut={handleSignout}
+          <Profile 
+            isLoading={isLoading}
+            setCurrentUser={setCurrentUser}
+            onUpdateUser={handleUpdateUser}
+            onSignOut={handleSignout}
+            isError={isError}
+            setIsError={setIsError}
+            isEditing={isEditing}
+            isSending={isSending}
+            onEditClick={handleEditClick}
+          />} />
 
-          //onUpdate={updateUserInfo}
-          isButtonSaveVisible={isButtonSaveVisible}
-          setIsButtonSaveVisible={setIsButtonSaveVisible}
-          //onLoad={isLoading}
-          onSuccessMessages={successMessages}
-          setSuccessMessages={setSuccessMessages}
-          error={errorMessages}
-          setErrorMessages={setErrorMessages}
-        />} />
+        <Route path='/signup' element={
+          <Register 
+            onRegisterUser={handleRegister} 
+            isError={isError}
+            setIsError={setIsError}
+          />} />
 
-        <Route path='/signup' element={<Register onRegister={handleRegister}/>} />
-        <Route path='/signin' element={<Login onLogin={handleLogin}/>} />
+        <Route path='/signin' element={
+          <Login 
+            onLoginUser={handleLogin} 
+            isError={isError}
+            setIsError={setIsError} 
+          />} />
+
         <Route path='*' element={<NotFound />} />
       </Routes>
       <Footer />
       {isLoading && <Preloader/>}
 
-      <InfoPopup message={infoPopup} /*onSubmit={}*//>
+      <InfoPopup 
+        isOpen={infoPopup}
+        title={infoPopupText} 
+        onSubmit={closeInfoPopup}
+      />
       
     </div>
     </CurrentUserContext.Provider>
@@ -566,15 +568,3 @@ function App() {
 }
 
 export { App };
-
-/*
-  <ProtectedRoute
-    path='/movies'
-    component={Movies}
-    onChangeFilters={handleChangeFilters}
-    moviesCards={moviesCards}
-    countCards={countCards}
-    onIncCountOfCards={handleIncCountOfCards}
-    onSaveMovieCard={handleSaveMovieCard}
-    onDeleteMovieCard={handleDeleteMovieCard} />} 
- */

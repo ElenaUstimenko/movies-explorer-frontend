@@ -1,90 +1,32 @@
 import './Login.css';
 import '../Register/Register.css'
-import { Link, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import logo from '../../images/logo/logo-smile.svg'
-import { useEffect, useState } from 'react';
-//import useFormValidation from '../../hooks/useFormValidation.js';
-
-import {
-  PATTERN_NAME,
-  PATTERN_EMAIL,
-  PATTERN_PASSWORD,
-} from "../../utils/constants.js";
-import { VALIDATION_MESSAGES } from "../../utils/validation.js";
-
+import useValidation from '../../hooks/useValidation.js';
+import { Preloader } from '../Preloader/Preloader.js';
 
 function Login(props) {
 
-  const { onLogin } = props;
+  const { onLoginUser, isLoading, setIsError } = props;
+  const { errors, isValid, handleChange, resetForm, formValue } = useValidation();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  useEffect(() => {
+    resetForm();
+  }, [resetForm]);
 
-  const navigate = useNavigate();
-
-  const handleSubmit = (evt) => {
-    evt.preventDefault();
-
-    if (!password || !email) { // проверка почты и пароля 
-      return;
-    }
-    onLogin({ email, password }) // сюда попадают данные из инпутов
+  const handleInputChange = (evt) => {
+    handleChange(evt);
+    setIsError(false);
   };
 
-  /*const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [emailFilled, setEmailFilled] = useState(false);
-  const [passwordFilled, setPasswordFilled] = useState(false);
-
-  const [emailError, setEmailError] = useState('Поле email не может быть пустым');
-  const [passwordError, setPasswordError] = useState('Поле пароль не может быть пустым');
-
-  const [formValid, setFormValid] = useState(false);*/
-
- /* useEffect (() => {
-    if (emailError || passwordError) {
-      setFormValid(false)
-    } else {
-      setFormValid(true)
-    }
-  }, [emailError, passwordError])
-
-  const clearHandler = (evt) => {
-    switch (evt.target.name) {
-      case 'email':
-        setEmailFilled(true);
-        break;
-      case 'password':
-        setPasswordFilled(true);
-        break;
-        default:  
-    }
-  }
-
-  const emailHandler = (evt) => {
-    setEmail(evt.target.value)
-    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    if(!re.test(String(evt.target.value).toLowerCase())) {
-      setEmailError('Некорректный email');
-      if(!evt.target.value) {
-        setEmailError('Поле email не может быть пустым');
-      }
-    } else {
-      setEmailError('');
-    }
-  }
-  
-  const passwordHandler = (evt) => {
-    setPassword(evt.target.value)
-    if(evt.target.value.length < 6 || evt.target.value.length < 8) {
-      setPasswordError('Пароль должен быть от 6 до 8 символов');
-      if(!evt.target.value) {
-        setPasswordError('Поле пароль не может быть пустым');
-      }
-    } else {
-      setPasswordError('');
-    }
-  }*/
+  function handleSubmit (evt) {
+    evt.preventDefault();
+    onLoginUser({
+      email: formValue.email,
+      password: formValue.password
+    })
+  };
 
   return (
     <section className='register login'>
@@ -103,6 +45,7 @@ function Login(props) {
           noValidate
           onSubmit={handleSubmit}
         >
+          {isLoading ? <Preloader /> : ''}
           <label className='register__field'>
             <h6 className='register__discription'>E-mail</h6>
             <input 
@@ -114,13 +57,19 @@ function Login(props) {
               minLength={2} 
               maxLength={30} 
               required
-              value={email} 
-              onChange={({target: {value}}) => setEmail(value)}
-              //onBlur={evt => clearHandler(evt)}
-              //onChange={evt => emailHandler(evt)}
-            />
-            {/*(emailFilled && emailError) && <div className='register__input-error'>{emailError}</div>*/}
+              autoComplete='on'
+              pattern='^.+@.+\..+$'
 
+              value={formValue.email || ''} 
+              onChange={handleInputChange}
+            />
+            <span
+                className={`register__input-error ${!isValid && errors.email
+                  ? 'register__input-error' 
+                  : ''}`}
+                id="email-error"
+            >{errors.email || ''}
+            </span>
           </label>
           <label className='register__field'>
             <h6 className='register__discription'>Пароль</h6>
@@ -131,29 +80,40 @@ function Login(props) {
               placeholder='Пароль' 
               type='password' 
               required
-              value={password} 
-              onChange={({target: {value}}) => setPassword(value)}
-              //onBlur={evt => clearHandler(evt)}
-              //onChange={evt => passwordHandler(evt)}
+              autoComplete='on'
+              pattern='.{8,}'
+
+              value={formValue.password || ''} 
+              onChange={handleInputChange}
             />
-            {/*(passwordFilled && passwordError) && <div className='register__input-error'>{passwordError}</div>*/}
-           
+            <span
+                className={`register__input-error ${!isValid && errors.password 
+                  ? 'register__input-error' 
+                  : ''}`}
+                id="password-error"
+            >{errors.password || ''}
+            </span>
           </label> 
           <button 
             name='button' 
             type='submit'
-            //disabled={!formValid}
-            className='register__button login__button'>Войти</button>
+            disabled={!isValid}
+            className={`register__button login__button ${!isValid && errors 
+              ? 'register__button_disabled' 
+              : ''}`}
+            >Войти</button>
           <div className='login__register'>
-            
-              <p className='register__text login__text'>Ещё не зарегистрированы?</p>
-              <Link className='register__text register__enter login__enter link' to={'/signup'}>Регистрация</Link>
-          
+            <p className='register__text login__text'
+            >Ещё не зарегистрированы?
+            </p>
+            <Link className='register__text register__enter login__enter link' to={'/signup'}
+            >Регистрация
+            </Link>
           </div>
         </form> 
       </div> 
     </section>
   ); 
-}
+};
 
 export { Login };

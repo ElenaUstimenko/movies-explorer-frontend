@@ -1,10 +1,17 @@
 import './MoviesCard.css';
 import { Link, useLocation } from 'react-router-dom';
 
-function MoviesCard({ data, saved, onSaveMovieCard, onDeleteMovieCard }) {
+function MoviesCard({ 
+  /*data, saved, onSaveMovieCard, onDeleteMovieCard*/
+  card, 
+  onSave, 
+  onCardDelete, 
+  savedCards 
+}) {
+
   const { pathname } = useLocation();
   
-  const { image, trailer, nameRU, duration, movieId} = data;
+ /* const { image, trailer, nameRU, duration, movieId} = data;
 
   const handleClick = () => {
     if (!saved) {
@@ -12,7 +19,7 @@ function MoviesCard({ data, saved, onSaveMovieCard, onDeleteMovieCard }) {
     } else {
       onDeleteMovieCard(movieId);
     }
-  };
+  };*/
 
   // корректное отображение длительности фильма
   function countTime(duration) {
@@ -24,36 +31,72 @@ function MoviesCard({ data, saved, onSaveMovieCard, onDeleteMovieCard }) {
     return hours ? `${hours}ч` : `${minutes}м`;
   }
 
+  // сохранение фильма
+  const handleSaveClick = () => {
+    onSave(card);
+  };
+
+  // удаление фильма
+  const handleDeleteClick = () => {
+    onCardDelete(card);
+  };
+
+  const isSaved = savedCards.some((item) => item.movieId === card.id);
+
+  const cardLikeButton = `movies-card__button movies-card__dislike ${
+    isSaved && 'movies-card__like'
+  }`;
+
   return (
     <li className='movies-card'>
-      <a href={trailer} 
+      <a href={card.trailer} 
         target='_blank'
         rel='noreferrer'>
         <img
           className='movies-card__picture'
-          src={image ? image : "#"}
-          alt={`постер фильма ${nameRU}`}
+          src={card.image ? card.image : "#"}
+          alt={`постер фильма ${card.nameRU}`}
         />
       </a>
       <div className='movies-card__name'>
-        <h6 className='movies-card__title'>{nameRU}</h6>
-          <button 
-          onClick={handleClick}
-          name='button' type='submit'
-          className={
-            `movies-card__button 
-            ${/*saved &&*/ pathname === '/movies' && 'movies-card__like'}
-            ${/*saved &&*/ (pathname === '/movies' ? 'movies-card__dislike' : 'movies-card__delete')}`
-          }
-          >
-          </button>
+        <h6 className='movies-card__title'>{card.nameRU}</h6>
+        
+        {pathname === '/movies' 
+          ? (
+            <button 
+              //onClick={handleClick}
+              onClick={handleSaveClick}
+              name='button' 
+              type='submit'
+              aria-label='Сохранить в избранное'
+              className={cardLikeButton}>
+            </button>
+            ) 
+          : (
+            <button 
+              //onClick={handleClick}
+              onClick={handleDeleteClick}
+              name='button' 
+              type='submit'
+              aria-label='Удалить'
+              className='movies-card__button movies-card__delete'>
+            </button>)
+        }
+        
       </div>
-      <p className='movies-card__time'>{countTime(duration)}</p> 
+      <p className='movies-card__time'>{countTime(card.duration)}</p> 
     </li>
   );
 }
 
 export { MoviesCard };
+
+/*className={
+  `movies-card__button 
+  ${saved && pathname === '/movies' && 'movies-card__like'}
+  ${saved && (pathname === '/movies' ? 'movies-card__dislike' : 'movies-card__delete')}`
+}*/
+
 
 /*{(pathname ==='/movies') && (
   <button 

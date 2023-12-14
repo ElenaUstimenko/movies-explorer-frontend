@@ -1,5 +1,24 @@
-//export const baseURL = 'http://localhost:3000';
 export const baseURL = 'https://api.diplommovies.nomoredomainsmonster.ru';
+
+const handleResponse = (res) => {
+  if (res.ok) {
+    return res.json()
+  } else {
+    return Promise.reject(res.status)
+  }
+};
+
+// получение данных пользователя при загрузке
+export const getAllContent = (token) => {
+  return fetch(`${baseURL}/users/me`, {
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
+    },
+  }).then((res) => res.json());
+};
 
 export const register = ({ name, email, password }) => {
   return fetch(`${baseURL}/signup`, {
@@ -63,123 +82,50 @@ export const userInformation = ({ name, email }) => {
   }).then(handleResponse)
 };
 
-
-const handleResponse = (res) => {
-  if (res.ok) {
-    return res.json() // возвращает promise 
-  } else {
-    return Promise.reject(`Ошибка: ${res.status}`) // если ошибка, отклоняет promise 
-  }
+// получение фильмов
+export const getSavedMovies = (token) => {
+  return fetch(`${baseURL}/movies`, {
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
+    },
+  }).then(handleResponse)
 };
 
-/*class MainApi extends Api {
-  constructor({ baseUrl, headers, credentials }) {
-    super({ baseUrl, headers, credentials });
-  }
+// сохранение фильма
+export const saveCard = (data, token) => {
+  return fetch(`${baseURL}/movies`, {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
+    },
+    body: JSON.stringify({
+      country: data.country,
+      director: data.director,
+      duration: data.duration,
+      description: data.description,
+      year: data.year,
+      image: `https://api.nomoreparties.co${data.image.url}`,
+      trailerLink: data.trailerLink,
+      thumbnail: `https://api.nomoreparties.co${data.image.formats.thumbnail.url}`,
+      nameRU: data.nameRU,
+      nameEN: data.nameEN,
+      movieId: data.id,
+    }),
+  }).then(handleResponse);
+};
 
-  async getMoviesList() {
-    const params = {
-      relativePath: '/movies',
-      method: 'GET',
-    };
-    const response = await this._getProxy(params);
-    return await this._handleResponse(response);
-  }
-
-  async addMovies({
-    country,
-    director,
-    duration,
-    year,
-    description,
-    image,
-    trailer,
-    thumbnail,
-    movieId,
-    nameRU,
-    nameEN,
-  }) {
-    const params = {
-      relativePath: '/movies',
-      method: 'POST',
-      body: JSON.stringify({
-        country,
-        director,
-        duration,
-        year,
-        description,
-        image,
-        trailer,
-        movieId,
-        nameRU,
-        nameEN,
-        thumbnail,
-      }),
-    };
-    const response = await this._getProxy(params);
-    return await this._handleResponse(response);
-  }
-
-  async deleteMovies(id) {
-    const params = {
-      relativePath: `/movies/${id}`,
-      method: 'DELETE',
-    };
-    const response = await this._getProxy(params);
-    return await this._handleResponse(response);
-  }
-
-  async signUp({ name, password, email }) {
-    const params = {
-      relativePath: '/signup',
-      method: 'POST',
-      body: JSON.stringify({ name, password, email }),
-    };
-    const response = await this._getProxy(params);
-    return await this._handleResponse(response);
-  }
-
- 
-
-
-
-  async signIn({ password, email }) {
-    const params = {
-      relativePath: '/signin',
-      method: 'POST',
-      body: JSON.stringify({ password, email }),
-    };
-    const response = await this._getProxy(params);
-    return await this._handleResponse(response);
-  }
-
-  async signOut() {
-    const params = {
-      relativePath: '/signout',
-      method: 'GET',
-    };
-    const response = await this._getProxy(params);
-    return await this._handleResponse(response);
-  }
-
-  async getUserInfo() {
-    const params = {
-      relativePath: '/users/me',
-      method: 'GET',
-    };
-    const response = await this._getProxy(params);
-    return await this._handleResponse(response);
-  }
-
-  async setUserInfo({ name, email }) {
-    const params = {
-      relativePath: '/users/me',
-      method: 'PATCH',
-      body: JSON.stringify({ name, email }),
-    };
-    const response = await this._getProxy(params);
-    return await this._handleResponse(response);
-  }
-}
-
-export default new MainApi(MAIN_API_SETTINGS);*/
+// удаление фильма
+export const deleteCard = (cardId, token) => {
+  return fetch(`${baseURL}/movies/${cardId}`, {
+    method: 'DELETE',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
+    },
+  }).then(handleResponse);
+};

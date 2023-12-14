@@ -4,7 +4,16 @@ import icon from '../../images/search_icon.svg';
 import { FilterCheckbox } from '../FilterCheckbox/FilterCheckbox';
 import useWindowDimensions from '../../hooks/useWindowDimensions.js';
 
-function SearchForm({ onChangeFilters, handleChangeFilter }) {
+function SearchForm({ 
+  onSubmit, 
+  onChange, 
+  value, 
+  checked,
+  onCheckboxChange, 
+  isError, 
+  isSending,
+  /*onChangeFilters, 
+  handleChangeFilter*/ }) {
 
   // лупу видно только на разрешении > 525px
   const isMobileWidth = useWindowDimensions() <= 525;
@@ -22,16 +31,16 @@ function SearchForm({ onChangeFilters, handleChangeFilter }) {
   };
 
   // ввод текста в search-form
-  const [searchText, setSearchText] = useState('');
+  /*const [searchText, setSearchText] = useState('');
 
   const handleChangeSearchText = (evt) => {
     setSearchText(evt.target.value);
     console.log('handleChangeSearchText', evt.target.value)
     //setIsSearchFormValid(true);
-  };
+  };*/
 
   // submit + валидация
-  const [isSearchFormValid, setIsSearchFormValid] = useState(true);
+  /*const [isSearchFormValid, setIsSearchFormValid] = useState(true);
 
   const handleSubmitValidation = (evt) => {
     if(!evt.target.value) {
@@ -42,23 +51,24 @@ function SearchForm({ onChangeFilters, handleChangeFilter }) {
       setIsSearchFormValid(true);
       console.log('true', evt.target.value)
     }
-  };
+  };*/
 
-  const handleSubmit = (evt) => {
+  /*const handleSubmit = (evt) => {
     evt.preventDefault();
     onChangeFilters({
       key: 'text',
       value: searchText,
     });
     handleSubmitValidation(evt);
-  };
+  };*/
 
   return (
     <section className='search-form' >
       <div className='search-form__container'>
         <form className='search-form__find'
-          onSubmit={handleSubmit}
-          //value={searchText}
+          //onSubmit={handleSubmit}
+          onSubmit={onSubmit} 
+          disabled={isSending}
           noValidate>
           <label className='search-form__field'>
 
@@ -69,26 +79,42 @@ function SearchForm({ onChangeFilters, handleChangeFilter }) {
               name='search'
               className='search-form__input'
               placeholder='Фильм'
-              minLength={2} maxLength={30} 
+              minLength={2} 
+              maxLength={30} 
               required
-              value={searchText}
-              onChange={handleChangeSearchText} 
+              //value={searchText}
+              //onChange={handleChangeSearchText} 
+              value={value}
+              onChange={onChange}
             />
             <span className='search-form__input-error'/>
           </label>  
-          <button name='button' type='submit'
-            className='button search-form__button'>Найти</button>
+          <button 
+            name='button' 
+            type='submit'
+            className='button search-form__button'
+            disabled={isSending}
+          >Найти
+          </button>
             
-            <span
-              className={`error${(!isSearchFormValid && ' error_visible') || ''}`}
-            >Нужно ввести ключевое слово
-            </span>
-            
+            {isError && <span className='search-form__error'>
+              Нужно ввести ключевое слово
+            </span>}
+ 
         </form>
-        <FilterCheckbox handleChangeFilter={handleChangeFilter} />
+        <FilterCheckbox 
+          checked={checked} 
+          onChange={onCheckboxChange}
+          //handleChangeFilter={handleChangeFilter} 
+        />
       </div>
     </section>
   );
-}
+};
 
 export { SearchForm };
+
+//<span
+             // className={`error${(!isSearchFormValid && ' error_visible') || ''}`}
+            //>Нужно ввести ключевое слово
+           // </span>

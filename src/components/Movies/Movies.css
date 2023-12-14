@@ -32,6 +32,17 @@
   border: 0;
 }
 
+.movies-error {
+  font-size: 26px;
+  line-height: 34px;
+  color: rgba(139, 139, 139, 1);
+  padding: 0;
+  margin: auto;
+  max-width: 300px;
+  font-weight: 400;
+  text-align: center;
+}
+
 @media screen and (max-width: 1024px) {
   .movies {
     max-width: 1024px;
