@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
 import './Header.css';
+import { useState } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import logo from '../../images/logo/logo-smile.svg';
 import { Navigation } from '../Navigation/Navigation.js';
 import useWindowDimensions from '../../hooks/useWindowDimensions.js';

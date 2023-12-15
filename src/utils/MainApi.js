@@ -82,7 +82,7 @@ export const userInformation = ({ name, email }) => {
   }).then(handleResponse)
 };
 
-// получение фильмов
+// получение сохранённых ранее фильмов
 export const getSavedMovies = (token) => {
   return fetch(`${baseURL}/movies`, {
     headers: {

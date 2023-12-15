@@ -1,7 +1,7 @@
 import { MOVIES_API_SETTINGS } from './constants.js';
 class MoviesApi {
-  constructor({ baseUrl }) {
-    this._url = baseUrl;
+  constructor(config) {
+    this._url = config.baseUrl;
   }
 
   _handleResponse(res) {
@@ -14,6 +14,7 @@ class MoviesApi {
 
   getMovies() {
     return fetch(`${this._url}`, {
+      method: "GET",
       headers: {},
     }).then(this._handleResponse);
   }

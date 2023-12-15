@@ -13,7 +13,7 @@
   width: 36px;
   margin-left: 29px;
   align-self: center;
-  background-color:rgba(32, 32, 32, 1);
+  background-color:rgba(47, 47, 47, 1);
   border: none;
   border-radius: 20px;
   overflow: hidden;
@@ -70,6 +70,10 @@
     position: absolute;
     bottom: -185px;
     padding-left: 120px;
+  }
+
+  .filter-checkbox__button {
+    background-color:rgba(32, 32, 32, 1);
   }
 }
 

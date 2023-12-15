@@ -1,11 +1,9 @@
 import './App.css';
 import { useState, useEffect } from 'react';
 import { Route, Routes, useNavigate, useLocation } from 'react-router-dom';
-import { ProtectedRouteElement } from '../ProtectedRoute/ProtectedRoute.js';
+import { ProtectedRoute } from '../ProtectedRoute/ProtectedRoute.js';
 import { CurrentUserContext } from "../../contexts/CurrentUserContext.js";
 import useValidation from '../../hooks/useValidation.js';
-
-//import { mainApi } from '../../utils/MainApi.js';
 import { moviesApi } from '../../utils/MoviesApi.js';
 import { MOVIES_API_SETTINGS } from '../../utils/constants.js';
 
@@ -41,8 +39,8 @@ function App() {
   const [isEditing, setIsEditing] = useState(false); // режим изменения для редактирования
   const [isSending, setIsSending] = useState(false);
   
-  const [currentViewportWidth, setCurrentViewportWidth] = useState(window.screen.width);
-  const [countCards, setCountCards] = useState(window.screen.width > 768 ? 12 : window.screen.width > 425 ? 8 : 5);
+  //const [currentViewportWidth, setCurrentViewportWidth] = useState(window.screen.width); // размер экрана
+  //const [countCards, setCountCards] = useState(window.screen.width > 768 ? 12 : window.screen.width > 425 ? 8 : 5);
   
   const[savedCards, setSavedCards] = useState([]);
 
@@ -240,8 +238,15 @@ function App() {
   };
   
   // MOVIES
+  const [cards, setCards] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredCards, setFilteredCards] = useState([]);
+  const [isShortMovie, setIsShortMovie] = useState(false);
+  const [isInputError, setIsInputError] = useState(false);
+  const [visibleCardsCount, setVisibleCardsCount] = useState(0);
+
   // рассчитывает количество колонок при изменении размеров экрана
-  useEffect(() => {
+  /*useEffect(() => {
     const handleResize = () => {
       if (window.screen.width !== currentViewportWidth) {
         setCountCards(window.screen.width > 768 ? 12 : window.screen.width > 425 ? 8 : 5);
@@ -253,11 +258,51 @@ function App() {
     return () => {
       window.removeEventListener('resize', handleResize);
     };
+  }, [currentViewportWidth]);*/
+
+  /*const handleShowCards = () => {
+    if (window.screen.width !== currentViewportWidth) {
+      setCountCards(window.screen.width > 768 ? 12 : window.screen.width > 425 ? 8 : 5);
+      setCurrentViewportWidth(window.screen.width);
+    }
+  };
+
+  useEffect(() => {
+    handleShowCards();
   }, [currentViewportWidth]);
 
-  // получение всех фильмов, их поиск
+  let timer = setTimeout(handleShowCards, 30000);
 
-  /*const getAllMovies = () => {
+  const handleResize = () => {
+    clearTimeout(timer);
+    timer = setTimeout(handleShowCards, 30000);
+  };
+
+  useEffect(() => {
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+ // добавление карточек по кнопке ещё
+ function handleAddMore() {
+  if (window.screen.width > 768) {
+    setVisibleCardsCount(
+      (visibleCardsCount) => visibleCardsCount + 3
+    );
+  }
+  if (window.screen.width > 425 || window.screen.width < 425) {
+    setVisibleCardsCount(
+      (visibleCardsCount) => visibleCardsCount + 2
+    );
+  }
+};
+*/
+
+
+  // получение всех фильмов, их поиск
+ /* const getAllMovies = () => {
     setIsLoading(true);
     moviesApi.getMovies()
       .then((cards) => {
@@ -293,10 +338,10 @@ function App() {
       .finally(() => {
         setIsLoading(false);
       });
-  }; */
+  };
 
    // фильтрация всех фильмов +
-  /* const handleFilterAllMovies = (filters) => {
+   const handleFilterAllMovies = (filters) => {
     if (localStorage.getItem('allMovies')) {
       setIsLoading(true);
       const filteredMovies = getFilteredMovies(JSON.parse(localStorage.getItem('allMovies')), filters) || [];
@@ -355,7 +400,6 @@ function App() {
         setIsLoading(false);
       });
   };*/
-
   /*const handleSaveMovieCard = (data) => {
     //проверяем, есть ли уже лайк на этой карточке
     const isLiked = data.likes.some(id => id === currentUser._id);
@@ -373,7 +417,6 @@ function App() {
       // формируем новый массив на основе имеющегося, подставляя в него новую карточку
       state.map((c) => (c._id === data._id ? newItem : c))
     )}
-  
   else {
     MainApi.deleteLike(data._id)
     .then((newItem) => { 
@@ -382,13 +425,10 @@ function App() {
     );
     })
     .catch(console.error);
-    
-  
       .finally(() => {
         setIsLoading(false);
       });
   };*/
-
   /*const handleCardLike = (card) => {
 	  //проверяем, есть ли уже лайк на этой карточке
 	   const isLiked = card.likes.some(id => id === currentUser._id);
@@ -410,7 +450,6 @@ function App() {
       }).catch(console.error)
     }
   };*/
-
   // удаление фильма из избранного
   /*const handleDeleteMovieCard = (movieId) => {
     const id = usersMoviesCards.find(item => item.movieId === movieId)._id;
@@ -428,7 +467,6 @@ function App() {
         setIsLoading(false);
       });
   };*/
-
  /* const handleCardDelete = (cardID) => {
     api.deleteCard(cardID)
     .then(() => {
@@ -438,7 +476,6 @@ function App() {
       // setCards((cards) => cards.filter((id) => id !== cardID));
     }).catch(console.error)
   };*/ 
-
   // получение списка фильмов пользователя при авторизации
   /*useEffect(() => {
     if (loggedIn) {
@@ -489,43 +526,35 @@ function App() {
       <Routes>
         <Route path='/' element={<Main />} />
   
-        <Route path='/movies' element={<Movies
-          //onChangeFilters={handleChangeFilters}
-          //moviesCards={moviesCards}
-          countCards={countCards}
-          //onIncCountOfCards={handleIncCountOfCards}
-          //onSaveMovieCard={handleSaveMovieCard}
-          //onDeleteMovieCard={handleDeleteMovieCard}
-          //usersMoviesCards={usersMoviesCards} 
-          
-          isError={isError}
-          onSave={handleSaveCard}
-          loggedIn={loggedIn}
+        <Route path='/movies' element={
+          <ProtectedRoute
+          element={Movies}
           isLoading={isLoading}
+          isSending={isSending}
+          setIsLoading={setIsLoading}
+          setIsSending={setIsSending}
+          isError={isError}
+          onSaveCard={handleSaveCard}
+          loggedIn={loggedIn}
           setIsError={setIsError}
           savedCards={savedCards}
-          
+          //handleAddMore={handleAddMore}
           />}
         />
   
-        <Route path='/saved-movies' element={<SavedMovies 
-          //onChangeFilters={handleChangeFilters}
-          //moviesCards={moviesCards}
-          countCards={countCards}
-          //onIncCountOfCards={handleIncCountOfCards}
-          //onSaveMovieCard={handleSaveMovieCard}
-          //onDeleteMovieCard={handleDeleteMovieCard}
-          //usersMoviesCards={usersMoviesCards} 
-          
-          savedCards={savedCards}
-              onDelete={handleCardDelete}
-              isError={isError}
-              loggedIn={loggedIn}
+        <Route path='/saved-movies' element={
+          <ProtectedRoute
+           element={SavedMovies} 
+           savedCards={savedCards}
+           onDelete={handleCardDelete}
+           isError={isError}
+           loggedIn={loggedIn}
           />} 
         />
 
         <Route path='/profile' element={
-          <Profile 
+          <ProtectedRoute
+            element={Profile}
             isLoading={isLoading}
             setCurrentUser={setCurrentUser}
             onUpdateUser={handleUpdateUser}

@@ -1,9 +1,9 @@
-import { useState } from 'react';
 import './FilterCheckbox.css';
+import { useState } from 'react';
 import sortButtonOn from '../../images/button/checkbox_on.svg';
 import sortButtonOff from '../../images/button/checkbox_off.svg';
 
-function FilterCheckbox({ /*onChangeFilters*/checked, onChange }) {
+function FilterCheckbox({ /*onChangeFilters,*/ checked, onChange }) {
   
   // изменение внешнего вида чекбокса
   const [isSorted, setIsSorted] = useState(false);
@@ -17,7 +17,7 @@ function FilterCheckbox({ /*onChangeFilters*/checked, onChange }) {
   };
   
   // сортировка
- /* const handleChangeFilter = (evt) => {
+  /*const handleChangeFilter = (evt) => {
     onChangeFilters({
       key: evt.target.name,
       value: evt.target.type === 'checkbox' ? evt.target.checked : evt.target.value,
@@ -28,7 +28,6 @@ function FilterCheckbox({ /*onChangeFilters*/checked, onChange }) {
     <label className='filter-checkbox'>
       <input 
         name='checkbox'
-        //type='checkbox'
         className='filter-checkbox__button'
         checked={checked} 
         onChange={onChange} 
@@ -39,13 +38,11 @@ function FilterCheckbox({ /*onChangeFilters*/checked, onChange }) {
         className='filter-checkbox__image'
         src={isSorted ? sortButtonOn : sortButtonOff} 
         alt='кнопка сортировки' 
-        onClick={handleSortClick}
-        //checked={checked}
-        //onChange={onChange}  
+        onClick={handleSortClick} 
       />
       <p className='filter-checkbox__type'>Короткометражки</p>
     </label>
   );
-}
+};
 
 export { FilterCheckbox };

@@ -33,14 +33,19 @@ function Navigation({ active, setActive, burgerMenuActive, setBurgerMenuActive }
   }
 
   return (
-    <div className={active ? 'navigation active' : 'navigation'} onClick={() => setActive(false)}>
+    <div className={active 
+      ? 'navigation active' 
+      : 'navigation'} 
+      onClick={() => setActive(false)}>
       <nav className='navigation__container' onClick={e => e.stopPropagation()}>
         <ul className='navigation__list'>
           {isMobileWidth && createNavigationLink('/', 'Главная')}
           {links.map(({ path, label }) => createNavigationLink(path, label))}
         </ul>
         
-          <Link className='navigation__link navigation__link_type_profile' to={'/profile'}>
+          <Link className='navigation__link navigation__link_type_profile' 
+          to={'/profile'}
+          >
             Аккаунт
             <img src={profileIcon} alt='белый кружочек'/>
           </Link>

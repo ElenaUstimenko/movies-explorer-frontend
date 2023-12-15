@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
 import './Register.css';
+import React, { useEffect } from 'react';
 import logo from '../../images/logo/logo-smile.svg'
 import { Link } from 'react-router-dom';
 import useValidation from '../../hooks/useValidation.js';

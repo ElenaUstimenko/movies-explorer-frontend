@@ -1,17 +1,12 @@
-import { useLocation } from 'react-router-dom';
 import './MoviesCardList.css';
+import { useLocation } from 'react-router-dom';
 import { MoviesCard } from '../MoviesCard/MoviesCard.js';
 
 function MoviesCardList({ 
-  //moviesCards = [], 
-  countCards, 
-  //usersMoviesCards, 
-  //onSaveMovieCard, 
-  //onDeleteMovieCard 
   cards, 
   visibleCardsCount, 
   savedCards, 
-  onSave, 
+  onSaveCard, 
   onDelete,
 }) {
  
@@ -25,7 +20,7 @@ function MoviesCardList({
             <MoviesCard 
               key={card.id}
               card={card} 
-              onSave={onSave} 
+              onSaveCard={onSaveCard} 
               savedCards={savedCards} 
             />
             ))) 
@@ -63,7 +58,7 @@ function MoviesCardList({
     : <div className="movies-card-list">
         <p className="movies-card-list__not-found">
           Ничего не найдено</p>
-      </div>*/
-/*}*/
+      </div>
+}*/
 
 export { MoviesCardList };

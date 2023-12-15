@@ -1,7 +1,7 @@
+import './Profile.css';
 import { useContext, useEffect } from "react";
 import { CurrentUserContext } from "../../contexts/CurrentUserContext.js";
 import { Link } from 'react-router-dom';
-import './Profile.css';
 import useValidation from '../../hooks/useValidation.js';
 
 function Profile({ 

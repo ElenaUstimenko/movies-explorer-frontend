@@ -1,25 +1,14 @@
 import './MoviesCard.css';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 function MoviesCard({ 
-  /*data, saved, onSaveMovieCard, onDeleteMovieCard*/
   card, 
-  onSave, 
+  onSaveCard, 
   onCardDelete, 
   savedCards 
 }) {
 
   const { pathname } = useLocation();
-  
- /* const { image, trailer, nameRU, duration, movieId} = data;
-
-  const handleClick = () => {
-    if (!saved) {
-      onSaveMovieCard(data);
-    } else {
-      onDeleteMovieCard(movieId);
-    }
-  };*/
 
   // корректное отображение длительности фильма
   function countTime(duration) {
@@ -33,7 +22,7 @@ function MoviesCard({
 
   // сохранение фильма
   const handleSaveClick = () => {
-    onSave(card);
+    onSaveCard(card);
   };
 
   // удаление фильма
@@ -64,7 +53,6 @@ function MoviesCard({
         {pathname === '/movies' 
           ? (
             <button 
-              //onClick={handleClick}
               onClick={handleSaveClick}
               name='button' 
               type='submit'
@@ -74,7 +62,6 @@ function MoviesCard({
             ) 
           : (
             <button 
-              //onClick={handleClick}
               onClick={handleDeleteClick}
               name='button' 
               type='submit'
@@ -87,30 +74,6 @@ function MoviesCard({
       <p className='movies-card__time'>{countTime(card.duration)}</p> 
     </li>
   );
-}
+};
 
 export { MoviesCard };
-
-/*className={
-  `movies-card__button 
-  ${saved && pathname === '/movies' && 'movies-card__like'}
-  ${saved && (pathname === '/movies' ? 'movies-card__dislike' : 'movies-card__delete')}`
-}*/
-
-
-/*{(pathname ==='/movies') && (
-  <button 
-  onClick={handleClick}
-  name="button" type="submit" 
-  className="movies-card__dislike movies-card__button"
-  >
-  </button>
-)}
-{(pathname ==='/saved-movies') && (
-  <button 
-  onClick={handleClick}
-  name="button" type="submit"
-  className="movies-card__delete movies-card__button"
-  >
-  </button>
-)}*/

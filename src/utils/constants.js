@@ -1,5 +1,5 @@
 export const MOVIES_API_SETTINGS = {
-  baseUrl: 'https://api.nomoreparties.co',
+  baseUrl: 'https://api.nomoreparties.co/beatfilm-movies',
   headers: {
     'Content-Type': 'application/json',
   },

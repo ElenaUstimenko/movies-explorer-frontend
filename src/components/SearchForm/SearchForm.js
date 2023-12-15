@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import './SearchForm.css';
 import icon from '../../images/search_icon.svg';
 import { FilterCheckbox } from '../FilterCheckbox/FilterCheckbox';
@@ -12,8 +11,7 @@ function SearchForm({
   onCheckboxChange, 
   isError, 
   isSending,
-  /*onChangeFilters, 
-  handleChangeFilter*/ }) {
+}) {
 
   // лупу видно только на разрешении > 525px
   const isMobileWidth = useWindowDimensions() <= 525;
@@ -30,43 +28,10 @@ function SearchForm({
     }
   };
 
-  // ввод текста в search-form
-  /*const [searchText, setSearchText] = useState('');
-
-  const handleChangeSearchText = (evt) => {
-    setSearchText(evt.target.value);
-    console.log('handleChangeSearchText', evt.target.value)
-    //setIsSearchFormValid(true);
-  };*/
-
-  // submit + валидация
-  /*const [isSearchFormValid, setIsSearchFormValid] = useState(true);
-
-  const handleSubmitValidation = (evt) => {
-    if(!evt.target.value) {
-      setIsSearchFormValid(false);
-      console.log('false', evt.target.value)
-      console.log('false', evt.target)
-    } else {
-      setIsSearchFormValid(true);
-      console.log('true', evt.target.value)
-    }
-  };*/
-
-  /*const handleSubmit = (evt) => {
-    evt.preventDefault();
-    onChangeFilters({
-      key: 'text',
-      value: searchText,
-    });
-    handleSubmitValidation(evt);
-  };*/
-
   return (
     <section className='search-form' >
       <div className='search-form__container'>
         <form className='search-form__find'
-          //onSubmit={handleSubmit}
           onSubmit={onSubmit} 
           disabled={isSending}
           noValidate>
@@ -82,8 +47,6 @@ function SearchForm({
               minLength={2} 
               maxLength={30} 
               required
-              //value={searchText}
-              //onChange={handleChangeSearchText} 
               value={value}
               onChange={onChange}
             />
@@ -105,7 +68,6 @@ function SearchForm({
         <FilterCheckbox 
           checked={checked} 
           onChange={onCheckboxChange}
-          //handleChangeFilter={handleChangeFilter} 
         />
       </div>
     </section>
@@ -113,8 +75,3 @@ function SearchForm({
 };
 
 export { SearchForm };
-
-//<span
-             // className={`error${(!isSearchFormValid && ' error_visible') || ''}`}
-            //>Нужно ввести ключевое слово
-           // </span>

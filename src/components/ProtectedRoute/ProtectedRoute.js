@@ -1,8 +1,8 @@
 import { Navigate } from 'react-router-dom';
 
-const ProtectedRouteElement = ({ element: Component, ...props  }) => {
+const ProtectedRoute = ({ loggedIn, element: Component, ...props  }) => {
   return (
-    props.loggedIn ? <Component {...props} /> : <Navigate to="/signin" replace/>
+    loggedIn ? <Component {...props} /> : <Navigate to="/" replace/>
 )}
 
-export { ProtectedRouteElement };
+export { ProtectedRoute };

@@ -1,35 +1,87 @@
+import './Movies.css';
 import { useState, useEffect, useCallback } from 'react';
 import { moviesApi } from "../../utils/MoviesApi.js";
-import './Movies.css';
 import { SearchForm } from '../SearchForm/SearchForm.js';
 import { MoviesCardList } from '../MoviesCardList/MoviesCardList.js';
 import { Preloader } from '../Preloader/Preloader.js';
+import { useScreen } from '../../hooks/useScreen.js';
 
 function Movies({
-  //onChangeFilters,
-  //moviesCards,
-  //usersMoviesCards,
+  isLoading,
+  isSending,
+  setIsLoading,
+  setIsSending,
+  moviesCards,
+  usersMoviesCards,
   countCards,
   onIncCountOfCards,
-  //onSaveMovieCard,
-  //onDeleteMovieCard,
+
+  //handleAddMore,
   isError, 
-  onSave, 
+  onSaveCard, 
   loggedIn, 
   setIsError, 
-  savedCards
+  savedCards,
  }) {
 
+  const [cards, setCards] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredCards, setFilteredCards] = useState([]);
-  const [cards, setCards] = useState([]);
   const [isShortMovie, setIsShortMovie] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [isInputError, setIsInputError] = useState(false);
   const [visibleCardsCount, setVisibleCardsCount] = useState(0);
-  const [isSending, setIsSending] = useState(false);
 
-  // фильтрация карточек
+  const { isDesktop, isTablet, isMobile } = useScreen();
+
+  // отображение определённого количества карточек
+  const handleShowCards = () => {
+    if (isDesktop) {
+      setVisibleCardsCount(12);
+    } else if (isTablet) {
+      setVisibleCardsCount(8);
+    } else if (isMobile) {
+      setVisibleCardsCount(5);
+    }
+  };
+
+  useEffect(() => {
+    handleShowCards();
+  }, [isDesktop, isTablet, isMobile]);
+
+  let timer = setTimeout(handleShowCards, 30000);
+
+  const handleResize = () => {
+    clearTimeout(timer);
+    timer = setTimeout(handleShowCards, 30000);
+  };
+
+  useEffect(() => {
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  // добавление карточек по кнопке ещё
+  function handleAddMore() {
+    if (isDesktop) {
+      setVisibleCardsCount(
+        (visibleCardsCount) => visibleCardsCount + 3
+      );
+    }
+    if (isTablet || isMobile) {
+      setVisibleCardsCount(
+        (visibleCardsCount) => visibleCardsCount + 2
+      );
+    }
+  };
+
+  // строка поиска
+  function handleSearchChange(evt) {
+    setSearchQuery(evt.target.value);
+  };
+
+  // фильтрация карточек на стороне клиента
   const filterMovies = useCallback(() => {
     const query = searchQuery.toLowerCase();
     let filteredMovies = cards.filter((movie) => {
@@ -41,16 +93,12 @@ function Movies({
     if (isShortMovie) {
       filteredMovies = filteredMovies.filter((movie) => movie.duration <= 40);
     }
-
     setFilteredCards(filteredMovies);
-  }, [searchQuery, cards, isShortMovie]);
+    console.log('filteredMovies', filteredMovies)
+    console.log('filteredCards', filteredCards)
+  }, [searchQuery, isShortMovie, cards]);
 
-  // строка поиска
-  function handleSearchChange(evt) {
-    setSearchQuery(evt.target.value);
-  };
-
-  // получение фильмов, их поиск
+  // получение всех фильмов
   const handleSearchMovies = () => {
     setIsSending(true);
     setIsLoading(true);
@@ -73,22 +121,22 @@ function Movies({
           setIsLoading(false);
         });
     };
-  
-    useEffect(() => {
-      filterMovies();
-    }, [filterMovies]);
-  
-    useEffect(() => {
-      if (localStorage.search && localStorage.isShort && localStorage.movies) {
-        const search = JSON.parse(localStorage.search);
-        setSearchQuery(search);
-        const isShort = JSON.parse(localStorage.isShort);
-        setIsShortMovie(isShort);
-        const movies = JSON.parse(localStorage.movies);
-        setCards(movies);
-      }
-    }, []);
-    
+
+  useEffect(() => {
+    filterMovies();
+  }, [filterMovies]);
+
+  useEffect(() => {
+    if (localStorage.search && localStorage.isShort && localStorage.movies) {
+      const search = JSON.parse(localStorage.search);
+      setSearchQuery(search);
+      const isShort = JSON.parse(localStorage.isShort);
+      setIsShortMovie(isShort);
+      const movies = JSON.parse(localStorage.movies);
+      setCards(movies);
+    }
+  }, []);
+   
   // checkbox
   function handleShortMoviesChange() {
     setIsShortMovie(!isShortMovie);
@@ -106,11 +154,10 @@ function Movies({
       setIsInputError(false);
     }
   };
-  
+
   return (
     <section className='movies'>
       <SearchForm 
-        //onChangeFilters={onChangeFilters}
         onSubmit={handleSubmit}
         onChange={handleSearchChange}
         value={searchQuery}
@@ -122,30 +169,26 @@ function Movies({
       {isLoading 
         ? (<Preloader />) 
         : isError 
-          ? (<p className='movies-error'>Во время запроса произошла ошибка. 
-              Возможно, проблема с соединением или сервер недоступен. 
-              Подождите немного и попробуйте ещё раз.
+          ? (<p className='movies-error'>Во время запроса произошла ошибка. Возможно, проблема 
+            с соединением или сервер недоступен. Подождите немного и попробуйте ещё раз.
             </p>) 
           : filteredCards.length > 0 
             ? (
               <>
                 <MoviesCardList 
-                  //moviesCards={moviesCards}
+                  moviesCards={moviesCards}
                   countCards={countCards}
-                  //usersMoviesCards={usersMoviesCards}
-                  //onSaveMovieCard={onSaveMovieCard}
-                  //onDeleteMovieCard={onDeleteMovieCard}
+                  usersMoviesCards={usersMoviesCards}
                   cards={filteredCards}
                   visibleCardsCount={visibleCardsCount}
                   savedCards={savedCards}
-                  onSave={onSave}
+                  onSaveCard={onSaveCard}
                 />
         
                 {visibleCardsCount < filteredCards.length && (
                   <div className='movies__more'>
                     <button className='button movies__button'
-                      onClick={onIncCountOfCards}
-                      //onClick={handleRowAdd}
+                      onClick={handleAddMore}
                     >Ещё
                     </button>
                   </div>
