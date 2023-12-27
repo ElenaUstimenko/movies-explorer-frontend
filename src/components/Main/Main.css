@@ -1,6 +1,5 @@
 .main {
   width: 100%;
-  /*max-width: 1280px;*/
   background: rgba(32, 32, 32, 1);
   margin: 0 auto;
   box-sizing: border-box;
@@ -8,21 +7,3 @@
   flex-direction: column;
   min-height: 100vh;
 }
-
-/*@media screen and (max-width: 1024px) {
-  .main {
-    max-width: 1024px;
-  }
-}
-
-@media screen and (max-width: 768px) {
-  .main {
-    max-width: 768px;
-  }
-}
-
-@media screen and (max-width: 320px) {
-  .main {
-    max-width: 320px;
-  }
-}*/

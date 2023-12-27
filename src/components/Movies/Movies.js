@@ -11,33 +11,28 @@ function Movies({
   isSending,
   setIsLoading,
   setIsSending,
-  moviesCards,
-  usersMoviesCards,
-  countCards,
-  onIncCountOfCards,
-
-  //handleAddMore,
-  isError, 
   onSaveCard, 
-  loggedIn, 
   setIsError, 
   savedCards,
  }) {
 
+  const [isErrorCards, setIsErrorCards] = useState(false);
   const [cards, setCards] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(''); // строка поиска
   const [filteredCards, setFilteredCards] = useState([]);
   const [isShortMovie, setIsShortMovie] = useState(false);
   const [isInputError, setIsInputError] = useState(false);
-  const [visibleCardsCount, setVisibleCardsCount] = useState(0);
-
-  const { isDesktop, isTablet, isMobile } = useScreen();
 
   // отображение определённого количества карточек
+  const [visibleCardsCount, setVisibleCardsCount] = useState(0);
+  const { isDesktop, isTablet, isSmallTablet, isMobile } = useScreen();
+
   const handleShowCards = () => {
     if (isDesktop) {
       setVisibleCardsCount(12);
     } else if (isTablet) {
+      setVisibleCardsCount(9);
+    } else if (isSmallTablet) {
       setVisibleCardsCount(8);
     } else if (isMobile) {
       setVisibleCardsCount(5);
@@ -46,13 +41,10 @@ function Movies({
 
   useEffect(() => {
     handleShowCards();
-  }, [isDesktop, isTablet, isMobile]);
-
-  let timer = setTimeout(handleShowCards, 30000);
+  }, [isDesktop, isTablet, isSmallTablet, isMobile]);
 
   const handleResize = () => {
-    clearTimeout(timer);
-    timer = setTimeout(handleShowCards, 30000);
+    handleShowCards();
   };
 
   useEffect(() => {
@@ -64,17 +56,16 @@ function Movies({
 
   // добавление карточек по кнопке ещё
   function handleAddMore() {
-    if (isDesktop) {
-      setVisibleCardsCount(
-        (visibleCardsCount) => visibleCardsCount + 3
-      );
-    }
-    if (isTablet || isMobile) {
-      setVisibleCardsCount(
-        (visibleCardsCount) => visibleCardsCount + 2
-      );
-    }
-  };
+    if (isDesktop) { 
+      setVisibleCardsCount((visibleCardsCount) => visibleCardsCount + 4);
+    };
+    if (isTablet) { 
+      setVisibleCardsCount((visibleCardsCount) => visibleCardsCount + 3);
+    };
+    if (isSmallTablet || isMobile) {
+      setVisibleCardsCount((visibleCardsCount) => visibleCardsCount + 2);
+    };
+  };   
 
   // строка поиска
   function handleSearchChange(evt) {
@@ -94,14 +85,12 @@ function Movies({
       filteredMovies = filteredMovies.filter((movie) => movie.duration <= 40);
     }
     setFilteredCards(filteredMovies);
-    console.log('filteredMovies', filteredMovies)
-    console.log('filteredCards', filteredCards)
-  }, [searchQuery, isShortMovie, cards]);
+  }, [isShortMovie, cards]);
 
-  // получение всех фильмов
+  // поиск фильмов
   const handleSearchMovies = () => {
-    setIsSending(true);
     setIsLoading(true);
+    setIsSending(true);
     moviesApi
       .getMovies()
       .then((cards) => {
@@ -115,7 +104,6 @@ function Movies({
         .catch((error) => {
           setIsError(true);
           console.log(error);
-          setIsSending(false);
         })
         .finally(() => {
           setIsLoading(false);
@@ -144,7 +132,6 @@ function Movies({
     filterMovies();
   };
 
-  // сабмит
   function handleSubmit(evt) {
     evt.preventDefault();
     if (searchQuery === '') {
@@ -152,60 +139,52 @@ function Movies({
     } else {
       handleSearchMovies(filteredCards);
       setIsInputError(false);
-    }
+    } 
   };
 
-  return (
+return (
     <section className='movies'>
       <SearchForm 
         onSubmit={handleSubmit}
         onChange={handleSearchChange}
         value={searchQuery}
-        checked={isShortMovie}
-        onCheckboxChange={handleShortMoviesChange}
         isError={isInputError}
         isSending={isSending}
+        // checkbox
+        checked={isShortMovie}
+        onCheckboxChange={handleShortMoviesChange}
       />
       {isLoading 
-        ? (<Preloader />) 
-        : isError 
-          ? (<p className='movies-error'>Во время запроса произошла ошибка. Возможно, проблема 
+        ? <Preloader />
+        : isErrorCards
+          ? <p className='movies-error'>Во время запроса произошла ошибка. Возможно, проблема 
             с соединением или сервер недоступен. Подождите немного и попробуйте ещё раз.
-            </p>) 
+            </p> 
           : filteredCards.length > 0 
             ? (
               <>
                 <MoviesCardList 
-                  moviesCards={moviesCards}
-                  countCards={countCards}
-                  usersMoviesCards={usersMoviesCards}
                   cards={filteredCards}
                   visibleCardsCount={visibleCardsCount}
                   savedCards={savedCards}
                   onSaveCard={onSaveCard}
                 />
-        
                 {visibleCardsCount < filteredCards.length && (
-                  <div className='movies__more'>
-                    <button className='button movies__button'
-                      onClick={handleAddMore}
-                    >Ещё
-                    </button>
-                  </div>
+                  <button 
+                    className="button movies__button" 
+                    onClick={handleAddMore}
+                  >
+                    Ещё
+                  </button>
                 )}
-              </>) 
-            : (<p className='movies-error'>Ничего не найдено</p>)
+              </>
+              ) 
+            : (
+              <p className='movies-error'>Ничего не найдено</p>
+            )
       }
     </section>
   );
 };
 
 export { Movies };
-
-/*{((moviesCards && moviesCards.length) || 0) > countCards &&
-  <div className='movies__more'>
-    <button className='button movies__button'
-      onClick={onIncCountOfCards}
-      >Ещё
-    </button>
-  </div>}*/

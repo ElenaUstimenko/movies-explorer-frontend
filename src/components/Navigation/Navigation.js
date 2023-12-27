@@ -3,7 +3,7 @@ import { NavLink, Link } from 'react-router-dom';
 import profileIcon from '../../images/button/profile_icon.svg';
 import useWindowDimensions from '../../hooks/useWindowDimensions.js';
 
-function Navigation({ active, setActive, burgerMenuActive, setBurgerMenuActive }) {
+function Navigation({ active, setActive }) {
 
   const isMobileWidth = useWindowDimensions() <= 768;
 

@@ -4,8 +4,6 @@ import { Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import { ProtectedRoute } from '../ProtectedRoute/ProtectedRoute.js';
 import { CurrentUserContext } from "../../contexts/CurrentUserContext.js";
 import useValidation from '../../hooks/useValidation.js';
-import { moviesApi } from '../../utils/MoviesApi.js';
-import { MOVIES_API_SETTINGS } from '../../utils/constants.js';
 
 import { 
   register, 
@@ -29,7 +27,6 @@ import { Register } from '../Register/Register.js';
 import { Login } from '../Login/Login.js';
 import { NotFound } from '../NotFound/NotFound.js';
 import { InfoPopup } from '../InfoPopup/InfoPopup.js';
-import { Preloader } from '../Preloader/Preloader.js';
 
 function App() {
 
@@ -38,15 +35,7 @@ function App() {
   const [isError, setIsError] = useState({}); // ошибки в инпутах
   const [isEditing, setIsEditing] = useState(false); // режим изменения для редактирования
   const [isSending, setIsSending] = useState(false);
-  
-  //const [currentViewportWidth, setCurrentViewportWidth] = useState(window.screen.width); // размер экрана
-  //const [countCards, setCountCards] = useState(window.screen.width > 768 ? 12 : window.screen.width > 425 ? 8 : 5);
-  
   const[savedCards, setSavedCards] = useState([]);
-
-  //const [usersMoviesCards, setUsersMoviesCards] = useState([]);
-  //const [moviesCards, setMoviesCards] = useState([]);
-  //const [filters, setFilters] = useState({});
   
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -66,7 +55,7 @@ function App() {
 
   const handleTokenCheck = () => {
     const token = localStorage.getItem('jwt');
-    if (token){
+    if (token) {
       return getAllContent(token)
       .then((res) => {
         setLoggedIn(true);
@@ -182,8 +171,8 @@ function App() {
   // стейт, отвечающий за данные пользователя
   const [currentUser, setCurrentUser] = useState({});
 
-  // вызывается при монтировании компонента 
-  // совершает запрос в API за пользовательскими данными
+  // вызывается при монтировании
+  // совершает запрос к API за пользовательскими данными
   useEffect(() => {
     const token = localStorage.getItem('jwt');
     if(token) {
@@ -238,283 +227,44 @@ function App() {
   };
   
   // MOVIES
-  const [cards, setCards] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filteredCards, setFilteredCards] = useState([]);
-  const [isShortMovie, setIsShortMovie] = useState(false);
-  const [isInputError, setIsInputError] = useState(false);
-  const [visibleCardsCount, setVisibleCardsCount] = useState(0);
-
-  // рассчитывает количество колонок при изменении размеров экрана
-  /*useEffect(() => {
-    const handleResize = () => {
-      if (window.screen.width !== currentViewportWidth) {
-        setCountCards(window.screen.width > 768 ? 12 : window.screen.width > 425 ? 8 : 5);
-        setCurrentViewportWidth(window.screen.width);
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, [currentViewportWidth]);*/
-
-  /*const handleShowCards = () => {
-    if (window.screen.width !== currentViewportWidth) {
-      setCountCards(window.screen.width > 768 ? 12 : window.screen.width > 425 ? 8 : 5);
-      setCurrentViewportWidth(window.screen.width);
-    }
-  };
-
-  useEffect(() => {
-    handleShowCards();
-  }, [currentViewportWidth]);
-
-  let timer = setTimeout(handleShowCards, 30000);
-
-  const handleResize = () => {
-    clearTimeout(timer);
-    timer = setTimeout(handleShowCards, 30000);
-  };
-
-  useEffect(() => {
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
-
- // добавление карточек по кнопке ещё
- function handleAddMore() {
-  if (window.screen.width > 768) {
-    setVisibleCardsCount(
-      (visibleCardsCount) => visibleCardsCount + 3
-    );
-  }
-  if (window.screen.width > 425 || window.screen.width < 425) {
-    setVisibleCardsCount(
-      (visibleCardsCount) => visibleCardsCount + 2
-    );
-  }
-};
-*/
-
-
-  // получение всех фильмов, их поиск
- /* const getAllMovies = () => {
+  // сохранение карточки и удаление из списка сохранённых на вкладке movies
+  function handleSaveCard(card) {
     setIsLoading(true);
-    moviesApi.getMovies()
-      .then((cards) => {
-        const allMovies = cards.map(({
-          country,
-          director,
-          duration,
-          year,
-          description,
-          image,
-          trailerLink,
-          thumbnail,
-          id,
-          nameRU,
-          nameEN,
-        }) => ({
-          country,
-          director,
-          duration,
-          year,
-          description,
-          image: image ? `${MOVIES_API_SETTINGS.baseUrl}${image.url}` : '',
-          trailer: trailerLink,
-          thumbnail: image ? `${MOVIES_API_SETTINGS.baseUrl}${image.url}` : '#',
-          movieId: id,
-          nameRU,
-          nameEN,
-        }));   
-        localStorage.setItem('allMovies', JSON.stringify(allMovies));
-        handleFilterAllMovies();
-      })  
-      .catch(console.error)
-      .finally(() => {
-        setIsLoading(false);
-      });
-  };
-
-   // фильтрация всех фильмов +
-   const handleFilterAllMovies = (filters) => {
-    if (localStorage.getItem('allMovies')) {
-      setIsLoading(true);
-      const filteredMovies = getFilteredMovies(JSON.parse(localStorage.getItem('allMovies')), filters) || [];
-      setMoviesCards(filteredMovies);
-      setIsLoading(false);
-    } else {
-      getAllMovies('');
-    }
-  };
-
-  // получение фильмов после фильтра +
-  const getFilteredMovies = (movies, { text = '', short = false }) => {
-    return movies.filter(item => {
-      if (short && item.duration > 40) {
-        return false;
-      }
-      for (let key in item) {
-        if (item.hasOwnProperty(key) && typeof item[key] === 'string' &&
-          item[key].toLowerCase().includes(text.toLowerCase())) {
-          return true;
-        }
-      }
-      return false;
-    });
-  };
-
-  // поиск фильмов по слову, их фильтр +
-  const handleChangeFilters = ({ key, value }) => {
-    setFilters(prev => {
-      handleFilterAllMovies({ ...prev, [key]: value });
-      return { ...prev, [key]: value };
-    });
-  };
-
-  // добавление новых фильмов в список +
-  const handleIncCountOfCards = () => {
-    setCountCards(prev => {
-        return prev + (window.screen.width > 768 ? 3 : 2);
-      },
-    );
-  };*/
-
-  // лайк фильма, добавление в избранное
-  /*const handleSaveMovieCard = (data) => {
-    setIsLoading(true);
-    MainApi.addMovies(data)
-      .then((res) => {
-        setUsersMoviesCards(prev => ([...prev, res]));
-      })
-      .catch(({ status, message }) => {
-        setError({ status, message });
-        navigate('*');
-        },
-      )
-      .finally(() => {
-        setIsLoading(false);
-      });
-  };*/
-  /*const handleSaveMovieCard = (data) => {
-    //проверяем, есть ли уже лайк на этой карточке
-    const isLiked = data.likes.some(id => id === currentUser._id);
-    setIsLoading(true);
-    if(!isLiked) {
-      MainApi.addMovies(data)
-      .then((res) => {
-        setUsersMoviesCards(prev => ([...prev, res]));
-      })
-    }
-    setIsLoading(true);
-    MainApi.addMovies(data)
-    .then((newItem) => { 
-      setCards((state) => 
-      // формируем новый массив на основе имеющегося, подставляя в него новую карточку
-      state.map((c) => (c._id === data._id ? newItem : c))
-    )}
-  else {
-    MainApi.deleteLike(data._id)
-    .then((newItem) => { 
-      setCards((state) => 
-      state.map((c) => (c._id === data._id ? newItem : c))
-    );
-    })
-    .catch(console.error);
-      .finally(() => {
-        setIsLoading(false);
-      });
-  };*/
-  /*const handleCardLike = (card) => {
-	  //проверяем, есть ли уже лайк на этой карточке
-	   const isLiked = card.likes.some(id => id === currentUser._id);
-    // отправляем запрос в API и получаем обновлённые данные карточки
-    if (!isLiked) {
-      api.addLike(card._id)
-      .then((newCard) => { 
-        setCards((state) => 
-        // формируем новый массив на основе имеющегося, подставляя в него новую карточку
-        state.map((c) => (c._id === card._id ? newCard : c))
-      );
-      }).catch(console.error)
-    } else {
-      api.deleteLike(card._id)
-      .then((newCard) => { 
-        setCards((state) => 
-        state.map((c) => (c._id === card._id ? newCard : c))
-      );
-      }).catch(console.error)
-    }
-  };*/
-  // удаление фильма из избранного
-  /*const handleDeleteMovieCard = (movieId) => {
-    const id = usersMoviesCards.find(item => item.movieId === movieId)._id;
-    setIsLoading(true);
-    MainApi.deleteMovies(id)
-      .then(() => {
-        setUsersMoviesCards(prev => prev.filter(item => item._id !== id));
-      })
-      .catch(({ status, message }) => {
-        setError({ status, message });
-        navigate('/saved-movies');
-        },
-      )
-      .finally(() => {
-        setIsLoading(false);
-      });
-  };*/
- /* const handleCardDelete = (cardID) => {
-    api.deleteCard(cardID)
-    .then(() => {
-      // используя методы массива, создаем новый массив карточек, 
-      // где не будет карточки, которую мы только что удалили
-      setCards((cards) => cards.filter((c) => c._id !== cardID)); 
-      // setCards((cards) => cards.filter((id) => id !== cardID));
-    }).catch(console.error)
-  };*/ 
-  // получение списка фильмов пользователя при авторизации
-  /*useEffect(() => {
-    if (loggedIn) {
-      setIsLoading(true);
-      MainApi.getMoviesList()
-        .then((data) => {
-          setUsersMoviesCards(data);
-        })
-        .catch(console.log)
-        .finally(() => {
-          setIsLoading(false);
-        });
-    }
-  }, [loggedIn]);*/
-  
-
-  // сохранение карточки и удаление из списка сохранённых
-  function handleSaveCard(data) {
-    const isSaved = savedCards.some(item => item.movieId === data.id)
-    const token = localStorage.getItem('jwt');
+    // проверяем, есть ли уже лайк на этой карточке
+    const isSaved = savedCards.some(SavedCard => SavedCard.movieId === card.id)
+    //const token = localStorage.getItem('jwt');
     if(isSaved) {
-      const cardToDelete = savedCards.find((card) => card.movieId === data.id)
+      const cardToDelete = savedCards.find((SavedCard) => SavedCard.movieId === card._id)
       handleCardDelete(cardToDelete);
     } else {
-      return saveCard(data, token)
+      // отправляем запрос в API и получаем обновлённые данные карточки
+      return saveCard(card)
       .then((newCard) => {
-        setSavedCards([newCard, ...savedCards])
+        setSavedCards((state) => 
+        // формируем новый массив на основе имеющегося, подставляя в него новую карточку
+        state.map((c) => (c._id === card._id? [newCard, ...savedCards] : c))
+        );
+        console.log('newCard', newCard);
       })
-      .catch((error) => console.log(error))
+      .catch((error) => console.log('Ошибка при сохранении фильма', error))
+      .finally(() => {
+        setIsLoading(false);
+      });
     }  
   };
 
+  // на вкладке saved-movies
   function handleCardDelete(card) {
-    const token = localStorage.getItem('jwt');
-    return deleteCard(card._id, token)
+    setIsLoading(true);
+    console.log('card._id:', card._id);
+    return deleteCard(card._id)
     .then(() => {
       setSavedCards((state) => state.filter((c) => c._id !== card._id));
     })
-    .catch((error => console.log(error)))
+    .catch((error => console.log('Ошибка при удалении фильма', error)))
+    .finally(() => {
+      setIsLoading(false);
+    });
   };
 
   return (
@@ -528,33 +278,35 @@ function App() {
   
         <Route path='/movies' element={
           <ProtectedRoute
-          element={Movies}
-          isLoading={isLoading}
-          isSending={isSending}
-          setIsLoading={setIsLoading}
-          setIsSending={setIsSending}
-          isError={isError}
-          onSaveCard={handleSaveCard}
-          loggedIn={loggedIn}
-          setIsError={setIsError}
-          savedCards={savedCards}
-          //handleAddMore={handleAddMore}
-          />}
+            element={Movies}
+            isLoading={isLoading}
+            isSending={isSending}
+            setIsLoading={setIsLoading}
+            setIsSending={setIsSending}
+            onSaveCard={handleSaveCard}
+            loggedIn={loggedIn}
+            setIsError={setIsError}
+            savedCards={savedCards}
+          />} 
         />
-  
+
         <Route path='/saved-movies' element={
           <ProtectedRoute
-           element={SavedMovies} 
-           savedCards={savedCards}
-           onDelete={handleCardDelete}
-           isError={isError}
-           loggedIn={loggedIn}
+            element={SavedMovies}
+            isLoading={isLoading}
+            isSending={isSending}
+            setIsLoading={setIsLoading}
+            setIsSending={setIsSending} 
+            savedCards={savedCards}
+            onDelete={handleCardDelete}
+            loggedIn={loggedIn}
           />} 
         />
 
         <Route path='/profile' element={
           <ProtectedRoute
             element={Profile}
+            loggedIn={loggedIn}
             isLoading={isLoading}
             setCurrentUser={setCurrentUser}
             onUpdateUser={handleUpdateUser}
@@ -583,7 +335,6 @@ function App() {
         <Route path='*' element={<NotFound />} />
       </Routes>
       <Footer />
-      {isLoading && <Preloader/>}
 
       <InfoPopup 
         isOpen={infoPopup}

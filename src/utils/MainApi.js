@@ -94,7 +94,7 @@ export const getSavedMovies = (token) => {
 };
 
 // сохранение фильма
-export const saveCard = (data, token) => {
+export const saveCard = (card) => {
   return fetch(`${baseURL}/movies`, {
     method: 'POST',
     headers: {
@@ -103,23 +103,23 @@ export const saveCard = (data, token) => {
       'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
     },
     body: JSON.stringify({
-      country: data.country,
-      director: data.director,
-      duration: data.duration,
-      description: data.description,
-      year: data.year,
-      image: `https://api.nomoreparties.co${data.image.url}`,
-      trailerLink: data.trailerLink,
-      thumbnail: `https://api.nomoreparties.co${data.image.formats.thumbnail.url}`,
-      nameRU: data.nameRU,
-      nameEN: data.nameEN,
-      movieId: data.id,
+      country: card.country,
+      director: card.director,
+      duration: card.duration,
+      description: card.description,
+      year: card.year,
+      image: `https://api.nomoreparties.co${card.image.url}`,
+      trailerLink: card.trailerLink,
+      thumbnail: `https://api.nomoreparties.co${card.image.formats.thumbnail.url}`,
+      nameRU: card.nameRU,
+      nameEN: card.nameEN,
+      movieId: card._id,
     }),
   }).then(handleResponse);
 };
 
 // удаление фильма
-export const deleteCard = (cardId, token) => {
+export const deleteCard = (cardId) => {
   return fetch(`${baseURL}/movies/${cardId}`, {
     method: 'DELETE',
     headers: {

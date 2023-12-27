@@ -5,7 +5,7 @@ function MoviesCard({
   card, 
   onSaveCard, 
   onCardDelete, 
-  savedCards 
+  savedCards,
 }) {
 
   const { pathname } = useLocation();
@@ -30,20 +30,23 @@ function MoviesCard({
     onCardDelete(card);
   };
 
-  const isSaved = savedCards.some((item) => item.movieId === card.id);
+  // цвета кнопки лайка
+  const isSaved = savedCards.some(item => item.nameEN === card.nameEN);
 
-  const cardLikeButton = `movies-card__button movies-card__dislike ${
-    isSaved && 'movies-card__like'
-  }`;
+  const cardLikeButtonClassName = `movies-card__button ${
+    isSaved ? 'movies-card__like' : 'movies-card__dislike'}`;
 
   return (
     <li className='movies-card'>
-      <a href={card.trailer} 
+      <a href={card.trailerLink} 
         target='_blank'
         rel='noreferrer'>
         <img
           className='movies-card__picture'
-          src={card.image ? card.image : "#"}
+          src={
+            pathname === '/movies'
+            ? `https://api.nomoreparties.co${card.image.url}`
+            : card.image}
           alt={`постер фильма ${card.nameRU}`}
         />
       </a>
@@ -51,13 +54,13 @@ function MoviesCard({
         <h6 className='movies-card__title'>{card.nameRU}</h6>
         
         {pathname === '/movies' 
-          ? (
+          ? ( 
             <button 
               onClick={handleSaveClick}
               name='button' 
               type='submit'
               aria-label='Сохранить в избранное'
-              className={cardLikeButton}>
+              className={cardLikeButtonClassName}>
             </button>
             ) 
           : (
@@ -65,11 +68,11 @@ function MoviesCard({
               onClick={handleDeleteClick}
               name='button' 
               type='submit'
-              aria-label='Удалить'
+              aria-label='Удалить из избранного'
               className='movies-card__button movies-card__delete'>
             </button>)
         }
-        
+      
       </div>
       <p className='movies-card__time'>{countTime(card.duration)}</p> 
     </li>

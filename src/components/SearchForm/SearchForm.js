@@ -32,21 +32,21 @@ function SearchForm({
     <section className='search-form' >
       <div className='search-form__container'>
         <form className='search-form__find'
-          onSubmit={onSubmit} 
           disabled={isSending}
+          onSubmit={onSubmit}
           noValidate>
           <label className='search-form__field'>
 
             {renderSearchForm()}
 
-            <input id='search-form-input' 
+            <input 
+              id='search-form-input' 
               type='text'
               name='search'
               className='search-form__input'
               placeholder='Фильм'
               minLength={2} 
               maxLength={30} 
-              required
               value={value}
               onChange={onChange}
             />
