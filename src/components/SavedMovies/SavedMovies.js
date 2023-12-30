@@ -46,6 +46,7 @@ function SavedMovies({
   // фильтрация карточек
   const filterMovies = useCallback(() => {
     const query = searchQuery.toLowerCase();
+    console.log('savedCards to check /saved-movies:', savedCards);
     let filteredMovies = savedCards.filter((movie) => {
       const movieTitleRU = movie.nameRU.toLowerCase();
       const movieTitleEN = movie.nameEN.toLowerCase();

@@ -230,21 +230,28 @@ function App() {
   // сохранение карточки и удаление из списка сохранённых на вкладке movies
   function handleSaveCard(card) {
     setIsLoading(true);
-    // проверяем, есть ли уже лайк на этой карточке
-    const isSaved = savedCards.some(SavedCard => SavedCard.movieId === card.id)
-    //const token = localStorage.getItem('jwt');
+    const isSaved = savedCards.some(SavedCard => SavedCard.movieId/*nameEN*/ === card.id/*nameEN*/)
+    //debugger;
+    console.log('was it saved before? ', isSaved); // false всегда если не через nameEN
+    console.log('card.id to check:', card.id);
+    console.log('savedCards to check:', savedCards);
+    
     if(isSaved) {
-      const cardToDelete = savedCards.find((SavedCard) => SavedCard.movieId === card._id)
+      const cardToDelete = savedCards.find((SavedCard) => SavedCard.movieId/*nameEN*/ === card.id/*nameEN*/)
+      console.log('card to delete: ', cardToDelete);
+      console.log('card.id to delete on /movies: ', card.id);
       handleCardDelete(cardToDelete);
     } else {
-      // отправляем запрос в API и получаем обновлённые данные карточки
+      console.log('saveCard for card: ', card);
+      //debugger;
       return saveCard(card)
       .then((newCard) => {
-        setSavedCards((state) => 
-        // формируем новый массив на основе имеющегося, подставляя в него новую карточку
-        state.map((c) => (c._id === card._id? [newCard, ...savedCards] : c))
+        setSavedCards((SavedCards) => 
+        SavedCards.map((SavedCard) => (SavedCard.id === card.id 
+         ? [newCard, ...savedCards] 
+         : SavedCard))
         );
-        console.log('newCard', newCard);
+        console.log('newCard: ', newCard);
       })
       .catch((error) => console.log('Ошибка при сохранении фильма', error))
       .finally(() => {
@@ -256,7 +263,7 @@ function App() {
   // на вкладке saved-movies
   function handleCardDelete(card) {
     setIsLoading(true);
-    console.log('card._id:', card._id);
+    console.log('card._id to delete on /saved-movies:', card._id);
     return deleteCard(card._id)
     .then(() => {
       setSavedCards((state) => state.filter((c) => c._id !== card._id));
