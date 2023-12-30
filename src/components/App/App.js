@@ -229,29 +229,41 @@ function App() {
   // MOVIES
   // сохранение карточки и удаление из списка сохранённых на вкладке movies
   function handleSaveCard(card) {
+    console.log('card to handleSaveCard:', card);
     setIsLoading(true);
-    const isSaved = savedCards.some(SavedCard => SavedCard.movieId/*nameEN*/ === card.id/*nameEN*/)
-    //debugger;
-    console.log('was it saved before? ', isSaved); // false всегда если не через nameEN
+    const isSaved = savedCards.some(item => item.movieId === card.id)
+    console.log('was it saved before? ', isSaved);
     console.log('card.id to check:', card.id);
     console.log('savedCards to check:', savedCards);
     
     if(isSaved) {
-      const cardToDelete = savedCards.find((SavedCard) => SavedCard.movieId/*nameEN*/ === card.id/*nameEN*/)
+      const cardToDelete = savedCards.find((item) => item.movieId/*nameEN*/ === card.id/*nameEN*/)
       console.log('card to delete: ', cardToDelete);
       console.log('card.id to delete on /movies: ', card.id);
       handleCardDelete(cardToDelete);
     } else {
       console.log('saveCard for card: ', card);
-      //debugger;
       return saveCard(card)
       .then((newCard) => {
-        setSavedCards((SavedCards) => 
-        SavedCards.map((SavedCard) => (SavedCard.id === card.id 
-         ? [newCard, ...savedCards] 
-         : SavedCard))
-        );
-        console.log('newCard: ', newCard);
+        setSavedCards([
+          {
+            country: card.country,
+            director: card.director,
+            duration: card.duration,
+            description: card.description,
+            year: card.year,
+            image: `https://api.nomoreparties.co${card.image.url}`,
+            trailerLink: card.trailerLink,
+            thumbnail: `https://api.nomoreparties.co${card.image.formats.thumbnail.url}`,
+            nameRU: card.nameRU,
+            nameEN: card.nameEN,
+            movieId: card._id,
+            _id: newCard.message,
+          },
+          ...savedCards]);
+        console.log('newCard: ', newCard, card);
+        console.log('...SavedCards: ', ...savedCards);
+        console.log('[newCard, ...savedCards]: ', [newCard, ...savedCards]);
       })
       .catch((error) => console.log('Ошибка при сохранении фильма', error))
       .finally(() => {
