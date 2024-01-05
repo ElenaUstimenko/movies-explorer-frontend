@@ -2,7 +2,7 @@ import './App.css';
 import { useState, useEffect } from 'react';
 import { Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import { ProtectedRoute } from '../ProtectedRoute/ProtectedRoute.js';
-import { CurrentUserContext } from "../../contexts/CurrentUserContext.js";
+import { CurrentUserContext } from '../../contexts/CurrentUserContext.js';
 import useValidation from '../../hooks/useValidation.js';
 
 import { 
@@ -15,6 +15,8 @@ import {
   getSavedMovies,
   saveCard,
   deleteCard,
+  addLike, // new
+  deleteLike, // new
 } from '../../utils/MainApi.js';
 
 import { Header } from '../Header/Header.js';
@@ -35,7 +37,7 @@ function App() {
   const [isError, setIsError] = useState({}); // ошибки в инпутах
   const [isEditing, setIsEditing] = useState(false); // режим изменения для редактирования
   const [isSending, setIsSending] = useState(false);
-  const[savedCards, setSavedCards] = useState([]);
+  const [savedCards, setSavedCards] = useState([]);
   
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -225,25 +227,38 @@ function App() {
     localStorage.removeItem('jwt');
     navigate('/signin');
   };
-  
+
   // MOVIES
   // сохранение карточки и удаление из списка сохранённых на вкладке movies
-  function handleSaveCard(card) {
-    console.log('card to handleSaveCard:', card);
+
+  // new
+  /*function handleSaveCard(card, currentUser) {
     setIsLoading(true);
-    const isSaved = savedCards.some(item => item.movieId === card.id)
-    console.log('was it saved before? ', isSaved);
-    console.log('card.id to check:', card.id);
-    console.log('savedCards to check:', savedCards);
-    
-    if(isSaved) {
-      const cardToDelete = savedCards.find((item) => item.movieId/*nameEN*/ === card.id/*nameEN*/)
+    // проверяем, есть ли уже лайк на этой карточке
+    const isLiked = savedCards.likes.some(id => id item => item.owner._id === card./*currentUser._id);
+    debugger;
+    console.log('was it liked before? ', isLiked); 
+
+    if (!isLiked) {
+      return addLike(card._id)
+      .then((newCard) => { 
+        setSavedCards((state) => 
+        // формируем новый массив на основе имеющегося, подставляя в него новую карточку
+        state.map((c) => (c._id === card._id ? newCard : c))
+      );
+      }).catch((error) => console.log('Ошибка при сохранении фильма', error))
+    } else {
+      return deleteLike(card._id)
+      .then((newCard) => { 
+        setSavedCards((state) => 
+        state.map((c) => (c._id === card._id ? newCard : c))
+      );
+  
+      /*const cardToDelete = savedCards.find((item) => item.nameEN === card.nameEN) //
       console.log('card to delete: ', cardToDelete);
-      console.log('card.id to delete on /movies: ', card.id);
       handleCardDelete(cardToDelete);
     } else {
-      console.log('saveCard for card: ', card);
-      return saveCard(card)
+      return saveCard(card, token)
       .then((newCard) => {
         setSavedCards([
           {
@@ -257,12 +272,58 @@ function App() {
             thumbnail: `https://api.nomoreparties.co${card.image.formats.thumbnail.url}`,
             nameRU: card.nameRU,
             nameEN: card.nameEN,
-            movieId: card._id,
             _id: newCard.message,
           },
           ...savedCards]);
-        console.log('newCard: ', newCard, card);
-        console.log('...SavedCards: ', ...savedCards);
+        console.log('[newCard, ...savedCards]: ', [newCard, ...savedCards]);
+      })
+      .catch((error) => console.log('Ошибка при удалении фильма', error))
+      .finally(() => {
+        setIsLoading(false);
+      });
+    }
+  };*/
+
+
+  function handleSaveCard(card) {
+    console.log('card to handleSaveCard:', card);
+    
+    setIsLoading(true);
+    const token = localStorage.getItem('jwt');
+    const isLiked = savedCards.some(item => item.nameEN/*movieId*/ === card.nameEN/*_id*/) // card._id underfined
+    // debugger;
+    // правильно работает если item.nameEN === card.nameEN
+    // true всегда если item.movieId === card._id
+    // false всегда если не через item.nameEN === card.nameEN
+    console.log('was it liked before? ', isLiked); 
+    console.log('savedCards to check:', savedCards);
+    
+    if(isLiked) {
+      // item.movieId === card.movieId удаляется последняя добавленная
+      // item.movieId === card._id удаляется последняя добавленная
+
+      const cardToDelete = savedCards.find((item) => item.movieId === card._id) // card._id underfined
+      console.log('card to delete: ', cardToDelete);
+      // debugger;
+      handleCardDelete(cardToDelete);
+    } else {
+      return saveCard(card, token)
+      .then((newCard) => {
+        setSavedCards([
+          {
+            country: card.country,
+            director: card.director,
+            duration: card.duration,
+            description: card.description,
+            year: card.year,
+            image: `https://api.nomoreparties.co${card.image.url}`,
+            trailerLink: card.trailerLink,
+            thumbnail: `https://api.nomoreparties.co${card.image.formats.thumbnail.url}`,
+            nameRU: card.nameRU,
+            nameEN: card.nameEN,
+            _id: newCard._id,
+          },
+          ...savedCards]);
         console.log('[newCard, ...savedCards]: ', [newCard, ...savedCards]);
       })
       .catch((error) => console.log('Ошибка при сохранении фильма', error))
@@ -275,8 +336,9 @@ function App() {
   // на вкладке saved-movies
   function handleCardDelete(card) {
     setIsLoading(true);
+    const token = localStorage.getItem('jwt');
     console.log('card._id to delete on /saved-movies:', card._id);
-    return deleteCard(card._id)
+    return deleteCard(card._id, token)
     .then(() => {
       setSavedCards((state) => state.filter((c) => c._id !== card._id));
     })

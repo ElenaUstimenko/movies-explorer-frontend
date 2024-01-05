@@ -14,6 +14,8 @@ function Movies({
   onSaveCard, 
   setIsError, 
   savedCards,
+  isLiked,
+  setIsLiked,
  }) {
 
   const [isErrorCards, setIsErrorCards] = useState(false);
@@ -95,6 +97,9 @@ function Movies({
       .getMovies()
       .then((cards) => {
         setCards(cards);
+        // при получении фильмов добавить для каждого id
+      cards.forEach.
+
         filterMovies(searchQuery, isShortMovie, cards);
         localStorage.setItem('search', JSON.stringify(searchQuery));
         localStorage.setItem('isShort', JSON.stringify(isShortMovie));

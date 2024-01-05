@@ -8,6 +8,7 @@ function MoviesCard({
   savedCards,
 }) {
 
+  const { movieId } = card;
   const { pathname } = useLocation();
 
   // корректное отображение длительности фильма
@@ -31,13 +32,13 @@ function MoviesCard({
   };
 
   // цвета кнопки лайка
-  const isSaved = savedCards.some(item => item.nameEN === card.nameEN);
+  const isLiked = savedCards.some(item => item.nameEN === card.nameEN);
 
   const cardLikeButtonClassName = `movies-card__button ${
-    isSaved ? 'movies-card__like' : 'movies-card__dislike'}`;
-
+    isLiked ? 'movies-card__like' : 'movies-card__dislike'}`;
+  
   return (
-    <li className='movies-card'>
+    <li className='movies-card' id={movieId}>
       <a href={card.trailerLink} 
         target='_blank'
         rel='noreferrer'>

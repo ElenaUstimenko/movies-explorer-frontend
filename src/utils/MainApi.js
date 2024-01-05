@@ -94,7 +94,7 @@ export const getSavedMovies = (token) => {
 };
 
 // сохранение фильма
-export const saveCard = (card) => {
+export const saveCard = (card, token) => {
   return fetch(`${baseURL}/movies`, {
     method: 'POST',
     headers: {
@@ -114,12 +114,13 @@ export const saveCard = (card) => {
       nameRU: card.nameRU,
       nameEN: card.nameEN,
       movieId: card._id,
+      /*number: card.id,*/
     }),
   }).then(handleResponse);
 };
 
 // удаление фильма
-export const deleteCard = (cardId) => {
+export const deleteCard = (cardId, token) => {
   return fetch(`${baseURL}/movies/${cardId}`, {
     method: 'DELETE',
     headers: {
@@ -129,3 +130,24 @@ export const deleteCard = (cardId) => {
     },
   }).then(handleResponse);
 };
+
+  // лайки
+  /*export const addLike = (cardId) => {
+    return fetch(`${baseURL}/movies/${cardId}/likes`, {
+      method: "PUT",
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
+      },
+    }).then(handleResponse);
+  };
+
+  export const deleteLike = (cardId) => {
+    return fetch(`${baseURL}/movies/${cardId}/likes`, {
+      method: "DELETE",
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
+      },
+    }).then(handleResponse);
+  };*/

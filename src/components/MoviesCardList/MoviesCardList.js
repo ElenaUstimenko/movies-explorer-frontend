@@ -9,7 +9,7 @@ function MoviesCardList({
   onSaveCard, 
   onDelete,
 }) {
-  
+  console.log('cards', cards);
   const { pathname } = useLocation();
 
   return (
@@ -19,6 +19,7 @@ function MoviesCardList({
         ? (cards.slice(0, visibleCardsCount).map((card) => (
           <MoviesCard 
             key={card.id}
+            movieId={card._id}
             card={card} 
             onSaveCard={onSaveCard} 
             savedCards={savedCards} 
@@ -26,10 +27,11 @@ function MoviesCardList({
           )))
         : (savedCards.slice(0, visibleCardsCount).map((card) => (
           <MoviesCard
-            key={card._id} 
+            key={card._id}
+            movieId={card._id} 
             card={card} 
             onCardDelete={onDelete}
-            savedCards={savedCards} 
+            savedCards={savedCards}
           />
           )))
       }
