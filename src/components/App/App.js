@@ -230,83 +230,30 @@ function App() {
 
   // MOVIES
   // сохранение карточки и удаление из списка сохранённых на вкладке movies
-
-  // new
-  /*function handleSaveCard(card, currentUser) {
-    setIsLoading(true);
-    // проверяем, есть ли уже лайк на этой карточке
-    const isLiked = savedCards.likes.some(id => id item => item.owner._id === card./*currentUser._id);
-    debugger;
-    console.log('was it liked before? ', isLiked); 
-
-    if (!isLiked) {
-      return addLike(card._id)
-      .then((newCard) => { 
-        setSavedCards((state) => 
-        // формируем новый массив на основе имеющегося, подставляя в него новую карточку
-        state.map((c) => (c._id === card._id ? newCard : c))
-      );
-      }).catch((error) => console.log('Ошибка при сохранении фильма', error))
-    } else {
-      return deleteLike(card._id)
-      .then((newCard) => { 
-        setSavedCards((state) => 
-        state.map((c) => (c._id === card._id ? newCard : c))
-      );
-  
-      /*const cardToDelete = savedCards.find((item) => item.nameEN === card.nameEN) //
-      console.log('card to delete: ', cardToDelete);
-      handleCardDelete(cardToDelete);
-    } else {
-      return saveCard(card, token)
-      .then((newCard) => {
-        setSavedCards([
-          {
-            country: card.country,
-            director: card.director,
-            duration: card.duration,
-            description: card.description,
-            year: card.year,
-            image: `https://api.nomoreparties.co${card.image.url}`,
-            trailerLink: card.trailerLink,
-            thumbnail: `https://api.nomoreparties.co${card.image.formats.thumbnail.url}`,
-            nameRU: card.nameRU,
-            nameEN: card.nameEN,
-            _id: newCard.message,
-          },
-          ...savedCards]);
-        console.log('[newCard, ...savedCards]: ', [newCard, ...savedCards]);
-      })
-      .catch((error) => console.log('Ошибка при удалении фильма', error))
-      .finally(() => {
-        setIsLoading(false);
-      });
-    }
-  };*/
-
-
   function handleSaveCard(card) {
     console.log('card to handleSaveCard:', card);
     
     setIsLoading(true);
     const token = localStorage.getItem('jwt');
-    const isLiked = savedCards.some(item => item.nameEN/*movieId*/ === card.nameEN/*_id*/) // card._id underfined
-    // debugger;
+    // проверяем был ли сохранена карточка ранее => да - удаляем её из сохранённых (стр.248-255), нет - сохраняем её (стр.256-274)
+    // проверка НЕ работает =>
     // правильно работает если item.nameEN === card.nameEN
     // true всегда если item.movieId === card._id
     // false всегда если не через item.nameEN === card.nameEN
+    const isLiked = savedCards.some(item => item.nameEN/*movieId*/ === card.nameEN/*_id*/) // debugger показывает card._id underfined
+    // debugger;
     console.log('was it liked before? ', isLiked); 
     console.log('savedCards to check:', savedCards);
     
-    if(isLiked) {
+    if(isLiked) {  // удаление НЕ работает => удаляется последняя созхранённая карточка
       // item.movieId === card.movieId удаляется последняя добавленная
       // item.movieId === card._id удаляется последняя добавленная
 
-      const cardToDelete = savedCards.find((item) => item.movieId === card._id) // card._id underfined
+      const cardToDelete = savedCards.find((item) => item.movieId === card._id) // debugger показывает card._id underfined
       console.log('card to delete: ', cardToDelete);
       // debugger;
       handleCardDelete(cardToDelete);
-    } else {
+    } else {   // сохранение работает
       return saveCard(card, token)
       .then((newCard) => {
         setSavedCards([

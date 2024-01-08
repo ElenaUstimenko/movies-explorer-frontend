@@ -32,7 +32,7 @@ function MoviesCard({
   };
 
   // цвета кнопки лайка
-  const isLiked = savedCards.some(item => item.nameEN === card.nameEN);
+  const isLiked = savedCards.some(item => item.nameEN === card.nameEN); // НЕ работает через сверку id
 
   const cardLikeButtonClassName = `movies-card__button ${
     isLiked ? 'movies-card__like' : 'movies-card__dislike'}`;
