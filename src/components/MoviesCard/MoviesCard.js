@@ -21,9 +21,11 @@ function MoviesCard({
     return hours ? `${hours}ч` : `${minutes}м`;
   }
 
+  const isLiked = savedCards.some(item => item.id === card.id)
+  
   // сохранение фильма
   const handleSaveClick = () => {
-    onSaveCard(card);
+    onSaveCard(card, isLiked);
   };
 
   // удаление фильма
@@ -32,8 +34,6 @@ function MoviesCard({
   };
 
   // цвета кнопки лайка
-  const isLiked = savedCards.some(item => item.nameEN === card.nameEN); // НЕ работает через сверку id
-
   const cardLikeButtonClassName = `movies-card__button ${
     isLiked ? 'movies-card__like' : 'movies-card__dislike'}`;
   

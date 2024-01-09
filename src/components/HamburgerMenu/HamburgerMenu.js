@@ -18,10 +18,12 @@ function HamburgerMenu({
   return (
       <div
         className={`hamburger-menu${
-          (burgerMenuActive && ' hamburger-menu_opened') || ""}`}>
+          (burgerMenuActive && ' hamburger-menu_opened') || ''}`}>
 
         <div className='hamburger-menu__container'>
-          <Navigation active={burgerMenuActive} setActive={setBurgerMenuActive} />
+          <Navigation 
+            active={burgerMenuActive} 
+            setActive={setBurgerMenuActive} />
         </div>
 
       </div>

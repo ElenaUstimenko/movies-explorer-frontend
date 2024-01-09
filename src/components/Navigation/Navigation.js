@@ -37,7 +37,8 @@ function Navigation({ active, setActive }) {
       ? 'navigation active' 
       : 'navigation'} 
       onClick={() => setActive(false)}>
-      <nav className='navigation__container' onClick={e => e.stopPropagation()}>
+      <nav className='navigation__container' 
+        onClick={e => e.stopPropagation()}>
         <ul className='navigation__list'>
           {isMobileWidth && createNavigationLink('/', 'Главная')}
           {links.map(({ path, label }) => createNavigationLink(path, label))}

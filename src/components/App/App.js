@@ -1,5 +1,5 @@
 import './App.css';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import { ProtectedRoute } from '../ProtectedRoute/ProtectedRoute.js';
 import { CurrentUserContext } from '../../contexts/CurrentUserContext.js';
@@ -15,9 +15,9 @@ import {
   getSavedMovies,
   saveCard,
   deleteCard,
-  addLike, // new
-  deleteLike, // new
 } from '../../utils/MainApi.js';
+
+import { moviesApi } from '../../utils/MoviesApi.js';
 
 import { Header } from '../Header/Header.js';
 import { Main } from '../Main/Main.js';
@@ -31,7 +31,7 @@ import { NotFound } from '../NotFound/NotFound.js';
 import { InfoPopup } from '../InfoPopup/InfoPopup.js';
 
 function App() {
-
+  
   const [isLoading, setIsLoading] = useState(false); // процесс загрузки данных
   const [loggedIn, setLoggedIn] = useState(false); // хранение состояния авторизации
   const [isError, setIsError] = useState({}); // ошибки в инпутах
@@ -71,10 +71,21 @@ function App() {
   useEffect(() => {
     if(loggedIn) {
       const token = localStorage.getItem('jwt');
-      Promise.all([ getAllContent(token), getSavedMovies(token)])
-        .then(([userInfo, movies]) => {
+      Promise.all([ getAllContent(token), getSavedMovies(token), moviesApi.getMovies()])
+        .then(([userInfo, savedMovies, movies]) => {
           setCurrentUser(userInfo);
-          setSavedCards(movies);
+          // добавляем id в каждый savedMovie из запроса для отображения лайка
+          const updatedSavedMovies = savedMovies.map(movie => {
+            const correspondingMovie = movies.find(m => m.trailerLink === movie.trailerLink)
+            if (correspondingMovie) {
+              return {
+                ...movie,
+                id: correspondingMovie.id,
+                _id: movie._id
+              }
+            }
+          })
+          setSavedCards(updatedSavedMovies);
         })
         .catch((error) => console.log(`Ошибка получения данных ${error}`));
       }
@@ -230,33 +241,16 @@ function App() {
 
   // MOVIES
   // сохранение карточки и удаление из списка сохранённых на вкладке movies
-  function handleSaveCard(card) {
-    console.log('card to handleSaveCard:', card);
-    
+  const handleSaveCard = useCallback((card, isLiked) => {
     setIsLoading(true);
     const token = localStorage.getItem('jwt');
-    // проверяем был ли сохранена карточка ранее => да - удаляем её из сохранённых (стр.248-255), нет - сохраняем её (стр.256-274)
-    // проверка НЕ работает =>
-    // правильно работает если item.nameEN === card.nameEN
-    // true всегда если item.movieId === card._id
-    // false всегда если не через item.nameEN === card.nameEN
-    const isLiked = savedCards.some(item => item.nameEN/*movieId*/ === card.nameEN/*_id*/) // debugger показывает card._id underfined
-    // debugger;
-    console.log('was it liked before? ', isLiked); 
-    console.log('savedCards to check:', savedCards);
     
-    if(isLiked) {  // удаление НЕ работает => удаляется последняя созхранённая карточка
-      // item.movieId === card.movieId удаляется последняя добавленная
-      // item.movieId === card._id удаляется последняя добавленная
-
-      const cardToDelete = savedCards.find((item) => item.movieId === card._id) // debugger показывает card._id underfined
-      console.log('card to delete: ', cardToDelete);
-      // debugger;
-      handleCardDelete(cardToDelete);
-    } else {   // сохранение работает
+    if(isLiked) {  
+      handleCardDelete(card);
+    } else {
       return saveCard(card, token)
       .then((newCard) => {
-        setSavedCards([
+        setSavedCards(prev => ([
           {
             country: card.country,
             director: card.director,
@@ -269,25 +263,28 @@ function App() {
             nameRU: card.nameRU,
             nameEN: card.nameEN,
             _id: newCard._id,
+            id: card.id
           },
-          ...savedCards]);
-        console.log('[newCard, ...savedCards]: ', [newCard, ...savedCards]);
+          ...prev]));
+        // console.log('[newCard, ...savedCards]: ', [newCard, ...savedCards]);
       })
       .catch((error) => console.log('Ошибка при сохранении фильма', error))
       .finally(() => {
         setIsLoading(false);
       });
-    }  
-  };
+    }
+  }, [savedCards]);
 
   // на вкладке saved-movies
   function handleCardDelete(card) {
+    console.log('handleCardDelete card', card)
     setIsLoading(true);
     const token = localStorage.getItem('jwt');
-    console.log('card._id to delete on /saved-movies:', card._id);
-    return deleteCard(card._id, token)
+    // console.log('card._id to delete on /saved-movies:', card._id);
+    const cardToDelete = savedCards.find(c => c.id === card.id)
+    return deleteCard(cardToDelete._id, token)
     .then(() => {
-      setSavedCards((state) => state.filter((c) => c._id !== card._id));
+      setSavedCards((state) => state.filter((c) => c.id !== card.id));
     })
     .catch((error => console.log('Ошибка при удалении фильма', error)))
     .finally(() => {

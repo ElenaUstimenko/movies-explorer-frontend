@@ -113,8 +113,6 @@ export const saveCard = (card, token) => {
       thumbnail: `https://api.nomoreparties.co${card.image.formats.thumbnail.url}`,
       nameRU: card.nameRU,
       nameEN: card.nameEN,
-      movieId: card._id,
-      /*number: card.id,*/
     }),
   }).then(handleResponse);
 };
@@ -130,24 +128,3 @@ export const deleteCard = (cardId, token) => {
     },
   }).then(handleResponse);
 };
-
-  // лайки
-  /*export const addLike = (cardId) => {
-    return fetch(`${baseURL}/movies/${cardId}/likes`, {
-      method: "PUT",
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
-      },
-    }).then(handleResponse);
-  };
-
-  export const deleteLike = (cardId) => {
-    return fetch(`${baseURL}/movies/${cardId}/likes`, {
-      method: "DELETE",
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
-      },
-    }).then(handleResponse);
-  };*/
