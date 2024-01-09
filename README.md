@@ -28,6 +28,9 @@ Backend https://api.diplommovies.nomoredomainsmonster.ru
 
 https://github.com/ElenaUstimenko/movies-explorer-frontend.git
 
+Pull Request:
+https://github.com/ElenaUstimenko/movies-explorer-frontend/pull/2
+
 ---
 
 
