@@ -148,6 +148,7 @@ function Movies({
     if (searchQuery === '') {
       setIsInputError(true);
     } else {
+      handleShowCards();
       handleSearchMovies(filteredCards);
       setIsInputError(false);
     } 
@@ -190,10 +191,12 @@ return (
                 )}
               </>
               ) 
-            : <Preloader />  
+            : <Preloader />     
       }
     </section>
   );
 };
 
 export { Movies };
+
+//<p className='movies-error'>Ничего не найдено</p>

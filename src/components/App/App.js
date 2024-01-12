@@ -114,8 +114,7 @@ function App() {
         setInfoPopupText('Вы успешно зарегистрировались!');
       }
     }).catch(error => {
-      // navigate('/signup')
-      
+
       if (error === 409) {
         setInfoPopup(true);
         setInfoPopupText('Пользователь с таким email уже существует.')   
@@ -149,7 +148,7 @@ function App() {
         setCurrentUser(res);
       }
     }).catch(error => {
-      // navigate('/signup');
+
       if (error === 401) {
         setInfoPopup(true);
         setInfoPopupText('Вы ввели неправильный логин или пароль.')   
@@ -213,6 +212,7 @@ function App() {
       setInfoPopup(true);
       setInfoPopupText('Данные успешно отредактированы!');
     }).catch(error => {
+
       if (error === 409) {
         setInfoPopup(true);
         setInfoPopupText('Пользователь с таким email уже существует.')   

@@ -35,7 +35,6 @@ function MoviesCardList({
           />
           )))
       }
-
       </ul>
     </div>
   )
