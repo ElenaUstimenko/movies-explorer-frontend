@@ -1,5 +1,5 @@
 import './SavedMovies.css';
-import '../Movies/Movies.css'
+import '../Movies/Movies.css';
 import { useState, useCallback,  useEffect } from 'react';
 import { SearchForm } from '../SearchForm/SearchForm.js';
 import { MoviesCardList } from '../MoviesCardList/MoviesCardList.js';
@@ -105,7 +105,7 @@ function SavedMovies({
         onCheckboxChange={handleShortMoviesChange}
       />
       {isLoading 
-        ? (<Preloader />)
+        ? <Preloader />
         : isErrorCards 
           ? (<p className='movies-error'>Во время запроса произошла ошибка. Возможно, проблема 
             с соединением или сервер недоступен. Подождите немного и попробуйте ещё раз.
@@ -119,7 +119,7 @@ function SavedMovies({
                   onDelete={onDelete}
                 />
               </>)
-            : (<p className='movies-error'>Ничего не найдено</p>)
+            : <Preloader />
       }
     </section>
   );

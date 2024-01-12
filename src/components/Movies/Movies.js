@@ -5,6 +5,7 @@ import { SearchForm } from '../SearchForm/SearchForm.js';
 import { MoviesCardList } from '../MoviesCardList/MoviesCardList.js';
 import { Preloader } from '../Preloader/Preloader.js';
 import { useScreen } from '../../hooks/useScreen.js';
+import { SHORT_MOVIE_MINUTES, DESKTOP_ADD, TABLET_ADD, MOBILE_ADD } from '../../utils/constants.js';
 
 function Movies({
   isLoading,
@@ -46,6 +47,15 @@ function Movies({
   const handleResize = () => {
     handleShowCards();
   };
+  
+  // при проверке расширения экрана убирает дополнительные карточки, 
+  // открытые с помощью кнопки Ещё
+  // let timer = setTimeout(handleShowCards, 30000);						
+              
+  // const handleResize = () => {						
+  //  clearTimeout(timer);						
+  //  timer = setTimeout(handleShowCards, 30000);						
+  // };	
 
   useEffect(() => {
     window.addEventListener('resize', handleResize);
@@ -57,13 +67,13 @@ function Movies({
   // добавление карточек по кнопке ещё
   function handleAddMore() {
     if (isDesktop) { 
-      setVisibleCardsCount((visibleCardsCount) => visibleCardsCount + 4);
+      setVisibleCardsCount((visibleCardsCount) => visibleCardsCount + DESKTOP_ADD);
     };
     if (isTablet) { 
-      setVisibleCardsCount((visibleCardsCount) => visibleCardsCount + 3);
+      setVisibleCardsCount((visibleCardsCount) => visibleCardsCount + TABLET_ADD);
     };
     if (isSmallTablet || isMobile) {
-      setVisibleCardsCount((visibleCardsCount) => visibleCardsCount + 2);
+      setVisibleCardsCount((visibleCardsCount) => visibleCardsCount + MOBILE_ADD);
     };
   };   
 
@@ -82,7 +92,7 @@ function Movies({
     });
 
     if (isShortMovie) {
-      filteredMovies = filteredMovies.filter((movie) => movie.duration <= 40);
+      filteredMovies = filteredMovies.filter((movie) => movie.duration <= SHORT_MOVIE_MINUTES);
     }
     setFilteredCards(filteredMovies);
   }, [isShortMovie, cards]);
@@ -123,7 +133,7 @@ function Movies({
       setIsShortMovie(isShort);
       const movies = JSON.parse(localStorage.movies);
       setCards(movies);
-    }
+    } 
   }, []);
    
   // checkbox
@@ -180,9 +190,7 @@ return (
                 )}
               </>
               ) 
-            : (
-              <p className='movies-error'>Ничего не найдено</p>
-            )
+            : <Preloader />  
       }
     </section>
   );

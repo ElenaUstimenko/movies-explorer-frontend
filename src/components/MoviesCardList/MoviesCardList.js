@@ -1,4 +1,5 @@
 import './MoviesCardList.css';
+import '../Movies/Movies.css';
 import { useLocation } from 'react-router-dom';
 import { MoviesCard } from '../MoviesCard/MoviesCard.js';
 
@@ -15,15 +16,17 @@ function MoviesCardList({
   return (
     <div className="movies-card-list">
       <ul className="movies-card-list__movies">
+       
       {pathname === '/movies' 
         ? (cards.slice(0, visibleCardsCount).map((card) => (
+          
           <MoviesCard 
             key={card.id}
             card={card} 
             onSaveCard={onSaveCard} 
             savedCards={savedCards} 
           /> 
-          )))
+          )))  
         : (savedCards.slice(0, visibleCardsCount).map((card) => (
           <MoviesCard
             key={card._id}
@@ -39,3 +42,6 @@ function MoviesCardList({
 };
 
 export { MoviesCardList };
+
+
+//<p className='movies-error'>Ничего не найдено</p>

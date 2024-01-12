@@ -46,7 +46,7 @@ function App() {
   const [infoPopup, setInfoPopup] = useState(false);
   const [infoPopupText, setInfoPopupText] = useState('');
 
-  const closeInfoPopup = () => {
+  const closeInfoPopup = (evt) => {
     setInfoPopup(false);
   };
 
@@ -69,6 +69,7 @@ function App() {
   };
 
   useEffect(() => {
+    setIsLoading(true);
     if(loggedIn) {
       const token = localStorage.getItem('jwt');
       Promise.all([ getAllContent(token), getSavedMovies(token), moviesApi.getMovies()])
@@ -87,7 +88,10 @@ function App() {
           })
           setSavedCards(updatedSavedMovies);
         })
-        .catch((error) => console.log(`Ошибка получения данных ${error}`));
+        .catch((error) => console.log(`Ошибка получения данных ${error}`))
+        .finally(() => {
+          setIsLoading(false);
+        })
       }
   }, [loggedIn]);
 
@@ -110,7 +114,7 @@ function App() {
         setInfoPopupText('Вы успешно зарегистрировались!');
       }
     }).catch(error => {
-      navigate('/signup')
+      // navigate('/signup')
       
       if (error === 409) {
         setInfoPopup(true);
@@ -143,11 +147,9 @@ function App() {
         console.log(localStorage.getItem('jwt'))
         navigate('/movies')
         setCurrentUser(res);
-        setInfoPopup(true);
-        setInfoPopupText('Вы успешно вошли!');
       }
     }).catch(error => {
-      navigate('/signup');
+      // navigate('/signup');
       if (error === 401) {
         setInfoPopup(true);
         setInfoPopupText('Вы ввели неправильный логин или пароль.')   
@@ -171,10 +173,10 @@ function App() {
         .then((res) => {
           if(res) {
             setLoggedIn(true);
-            navigate('/movies');
-          } else {
-            navigate('/signin');
-          }
+            // navigate('/movies');
+          } // else {
+            // navigate('/signin');
+          //}
         }).catch(({ status, message }) => {
           setIsError({ status, message });
           })
@@ -236,13 +238,15 @@ function App() {
   const handleSignout = (res) => {
     setLoggedIn(false);
     localStorage.removeItem('jwt');
-    navigate('/signin');
+    localStorage.removeItem('search');
+    localStorage.removeItem('isShort');
+    localStorage.removeItem('movies');
+    navigate('/');
   };
 
   // MOVIES
   // сохранение карточки и удаление из списка сохранённых на вкладке movies
   const handleSaveCard = useCallback((card, isLiked) => {
-    setIsLoading(true);
     const token = localStorage.getItem('jwt');
     
     if(isLiked) {  
@@ -269,27 +273,19 @@ function App() {
         // console.log('[newCard, ...savedCards]: ', [newCard, ...savedCards]);
       })
       .catch((error) => console.log('Ошибка при сохранении фильма', error))
-      .finally(() => {
-        setIsLoading(false);
-      });
     }
   }, [savedCards]);
 
   // на вкладке saved-movies
   function handleCardDelete(card) {
     console.log('handleCardDelete card', card)
-    setIsLoading(true);
     const token = localStorage.getItem('jwt');
-    // console.log('card._id to delete on /saved-movies:', card._id);
     const cardToDelete = savedCards.find(c => c.id === card.id)
     return deleteCard(cardToDelete._id, token)
     .then(() => {
       setSavedCards((state) => state.filter((c) => c.id !== card.id));
     })
     .catch((error => console.log('Ошибка при удалении фильма', error)))
-    .finally(() => {
-      setIsLoading(false);
-    });
   };
 
   return (

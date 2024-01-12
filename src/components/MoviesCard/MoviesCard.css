@@ -3,6 +3,10 @@
   list-style-type: none;
 }
 
+.movies-card:hover .movies-card__visible {
+  display: block;
+}
+
 .movies-card__picture {
   width: 270px;
   height: 151px;
@@ -51,6 +55,11 @@
 
 .movies-card__delete {
   background-image: url("../../images/button/button_delete.svg");
+}
+
+.movies-card__visible {
+  background-image: url("../../images/button/button_delete.svg");
+  display: none;
 }
 
 .movies-card__time {

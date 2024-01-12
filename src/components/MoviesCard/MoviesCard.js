@@ -1,5 +1,6 @@
 import './MoviesCard.css';
 import { useLocation } from 'react-router-dom';
+import useWindowDimensions from '../../hooks/useWindowDimensions.js';
 
 function MoviesCard({ 
   card, 
@@ -7,6 +8,8 @@ function MoviesCard({
   onCardDelete, 
   savedCards,
 }) {
+
+  const isMobileWidth = useWindowDimensions() <= 768;
 
   const { movieId } = card;
   const { pathname } = useLocation();
@@ -36,6 +39,12 @@ function MoviesCard({
   // цвета кнопки лайка
   const cardLikeButtonClassName = `movies-card__button ${
     isLiked ? 'movies-card__like' : 'movies-card__dislike'}`;
+
+  // кнопка удаления
+  const cardDeleteButtonClassName = 
+  `${isMobileWidth 
+    ? 'movies-card__button movies-card__delete' 
+    : 'movies-card__button movies-card__visible'}`;
   
   return (
     <li className='movies-card' id={movieId}>
@@ -70,7 +79,7 @@ function MoviesCard({
               name='button' 
               type='submit'
               aria-label='Удалить из избранного'
-              className='movies-card__button movies-card__delete'>
+              className={cardDeleteButtonClassName}>
             </button>)
         }
       

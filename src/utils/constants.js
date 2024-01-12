@@ -12,3 +12,9 @@ export const MAIN_API_SETTINGS = {
   },
   credentials: 'include',
 };
+
+export const SHORT_MOVIE_MINUTES = 40;
+
+export const DESKTOP_ADD = 4;
+export const TABLET_ADD = 3;
+export const MOBILE_ADD = 2;
