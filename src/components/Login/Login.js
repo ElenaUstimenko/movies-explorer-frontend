@@ -59,7 +59,7 @@ function Login(props) {
               required
               autoComplete='on'
               pattern='^.+@.+\..+$'
-
+              title='Поле e-mail должно быть обязательно заполнено.'
               value={formValue.email || ''} 
               onChange={handleInputChange}
             />
@@ -82,7 +82,7 @@ function Login(props) {
               required
               autoComplete='on'
               pattern='.{8,}'
-
+              title='Пароль должен состоять из не менее чем 8 символов.'
               value={formValue.password || ''} 
               onChange={handleInputChange}
             />

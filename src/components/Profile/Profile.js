@@ -69,6 +69,7 @@ function Profile({
                 value={formValue.name || ''}
                 onChange={handleInputChange}
                 pattern='[A-Za-zА-Яа-я]{2,30}'
+                title='Имя должно сост. из не менее чем 2 симв., вкл. только латиницу и кириллицу.'
               /> 
             ) : (
                 <p className='profile__input_type_text'>{currentUser.name}</p>
@@ -97,6 +98,7 @@ function Profile({
                 value={formValue.email || ''}
                 onChange={handleInputChange}
                 pattern='^.+@.+\..+$'
+                title='Поле e-mail должно быть обязательно заполнено.'
               />
             ) : (
                 <p className='profile__input_type_text'>{currentUser.email}</p>

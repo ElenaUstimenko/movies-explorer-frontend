@@ -57,7 +57,7 @@ function Register(props) {
               maxLength={30} 
               required
               pattern='[A-Za-zА-Яа-я]{2,30}'
-
+              title='Имя должно сост. из не менее чем 2 симв., вкл. только латиницу и кириллицу.'
               value={formValue.name || ''} 
               onChange={handleInputChange}
             />
@@ -78,7 +78,7 @@ function Register(props) {
               maxLength={30} 
               required
               pattern='^.+@.+\..+$'
-
+              title='Поле e-mail должно быть обязательно заполнено.'
               value={formValue.email || ''} 
               onChange={handleInputChange}
             />
@@ -97,7 +97,7 @@ function Register(props) {
               type='password' 
               required
               pattern='.{8,}'
-
+              title='Пароль должен состоять из не менее чем 8 символов.'
               value={formValue.password || ''}
               onChange={handleInputChange} 
             />
