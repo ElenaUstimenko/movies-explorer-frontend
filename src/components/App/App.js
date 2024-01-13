@@ -42,11 +42,16 @@ function App() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
+
+  // ОШИБКА 1
+  // После каждой выдачи попапа происходит перезагрузка приложения. Такого эффекта в SPA не должно быть.
+  // => перекидывает на /, как исправить?
+
   // INFO POPUP
   const [infoPopup, setInfoPopup] = useState(false);
   const [infoPopupText, setInfoPopupText] = useState('');
 
-  const closeInfoPopup = (evt) => {
+  const closeInfoPopup = () => {
     setInfoPopup(false);
   };
 
@@ -67,6 +72,12 @@ function App() {
       })
     } 
   };
+
+  // ОШИБКА 2
+  // Как надо: Если запрос выполняется впервые, то работа с фильтром происходит после получения данных.
+  // По условию задания запрос к базе с фильмами должен производиться при первом поиске, 
+  // а не при монтировании компонента или загрузке страницы 
+  // => убрать moviesApi.getMovies() из App.js, перенести про id?
 
   useEffect(() => {
     setIsLoading(true);

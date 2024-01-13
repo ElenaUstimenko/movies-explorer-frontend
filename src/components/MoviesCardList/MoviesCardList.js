@@ -13,6 +13,15 @@ function MoviesCardList({
   // console.log('cards', cards);
   const { pathname } = useLocation();
 
+
+  // ОШИБКА 4
+  // Если ничего не найдено, выводится надпись «Ничего не найдено».
+  // Надпись "Ничего не найдено" присутствует на странице фильмов сразу же при входе, 
+  // когда пользователь ещё ничего не искал, а не только когда ничего не найдено.
+  // => убрала <p className='movies-error'>Ничего не найдено</p> из Movies.js, заменила на прелоадер, 
+  // нужно добавить <p className='movies-error'>Ничего не найдено</p>  условием в MoviesCardList.js, 
+  // чтобы или загружались карточки или была надпись? 
+
   return (
     <div className="movies-card-list">
       <ul className="movies-card-list__movies">

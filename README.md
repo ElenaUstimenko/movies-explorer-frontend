@@ -11,7 +11,7 @@
 * Авторизация пользователя
 * Редактирование данных пользователя
 * Получение списка сохранённых пользователем фильмов
-* Создание и удаление фильмов
+* Сохранение фильма и удаление его из списка сохранённых фильмов
 
 ---
 **Стек технологий**
@@ -44,7 +44,7 @@ Functionality:
 * User Authorization
 * Editing user data
 * Get a list of saved movies
-* Making and deleting movies
+* Saving a movie and removing it from the list of saved movies
 
 ---
 **Technology stack**

@@ -5,6 +5,7 @@ import { SearchForm } from '../SearchForm/SearchForm.js';
 import { MoviesCardList } from '../MoviesCardList/MoviesCardList.js';
 import { Preloader } from '../Preloader/Preloader.js';
 import { useScreen } from '../../hooks/useScreen.js';
+import { SHORT_MOVIE_MINUTES } from '../../utils/constants.js';
 
 function SavedMovies({ 
   loggedIn,
@@ -53,7 +54,7 @@ function SavedMovies({
       return movieTitleRU.includes(query) || movieTitleEN.includes(query);
     });
     if (isShortMovie) {
-      filteredMovies = filteredMovies.filter((movie) => movie.duration <= 40);
+      filteredMovies = filteredMovies.filter((movie) => movie.duration <= SHORT_MOVIE_MINUTES);
     }
     setFilteredCards(filteredMovies);
   }, [isSubmit, isShortMovie, savedCards]);
@@ -126,3 +127,5 @@ function SavedMovies({
 };
 
 export { SavedMovies };
+
+//<p className='movies-error'>Ничего не найдено</p>
