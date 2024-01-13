@@ -7,16 +7,18 @@ import { Preloader } from '../Preloader/Preloader.js';
 import { useScreen } from '../../hooks/useScreen.js';
 import { SHORT_MOVIE_MINUTES, DESKTOP_ADD, TABLET_ADD, MOBILE_ADD } from '../../utils/constants.js';
 
-function Movies({
-  isLoading,
-  isSending,
-  setIsLoading,
-  setIsSending,
-  onSaveCard, 
-  setIsError, 
-  savedCards,
- }) {
+function Movies(props) {
 
+  const { 
+    loggedIn,
+    onLikeCard, 
+    onDelete,
+    savedCards, 
+  } = props;
+
+  const [isLoading, setIsLoading] = useState(false); // процесс загрузки данных
+  const [isError, setIsError] = useState({}); // ошибки в инпутах
+  const [isSending, setIsSending] = useState(false);
   const [isErrorCards, setIsErrorCards] = useState(false);
   const [cards, setCards] = useState([]);
   const [searchQuery, setSearchQuery] = useState(''); // строка поиска
@@ -47,15 +49,6 @@ function Movies({
   const handleResize = () => {
     handleShowCards();
   };
-  
-  // при проверке расширения экрана убирает дополнительные карточки, 
-  // открытые с помощью кнопки Ещё
-  // let timer = setTimeout(handleShowCards, 30000);						
-              
-  // const handleResize = () => {						
-  //  clearTimeout(timer);						
-  //  timer = setTimeout(handleShowCards, 30000);						
-  // };	
 
   useEffect(() => {
     window.addEventListener('resize', handleResize);
@@ -104,11 +97,22 @@ function Movies({
   // => handleSearchMovies из Movies.js
 
 
+  // работает если перезагрузить - переделать ещё
   // поиск фильмов
-  const handleSearchMovies = () => {
-    setIsLoading(true);
-    setIsSending(true);
-    moviesApi
+  /*const handleSearchMovies = () => {
+    //setIsLoading(true);
+    //setIsSending(true);
+    
+    if (cards.length !== 0) {
+      filterMovies(searchQuery, isShortMovie, cards);
+      localStorage.setItem('search', JSON.stringify(searchQuery));
+      localStorage.setItem('isShort', JSON.stringify(isShortMovie));
+      localStorage.setItem('movies', JSON.stringify(cards));
+      setCards(cards);
+    } else {
+      setIsLoading(true);
+      setIsSending(true);
+      moviesApi
       .getMovies()
       .then((cards) => {
         setCards(cards);
@@ -125,8 +129,32 @@ function Movies({
         })
         .finally(() => {
           setIsLoading(false);
+          // setIsSending(false);
         });
-    };
+      }
+    };*/
+  const handleSearchMovies = () => {
+    setIsLoading(true);
+    setIsSending(true);
+    moviesApi
+      .getMovies()
+      .then((cards) => {
+        setCards(cards);
+  
+        filterMovies(searchQuery, isShortMovie, cards);
+        localStorage.setItem('search', JSON.stringify(searchQuery));
+        localStorage.setItem('isShort', JSON.stringify(isShortMovie));
+        localStorage.setItem('movies', JSON.stringify(cards));
+        setIsSending(false);
+      })
+        .catch((error) => {
+          setIsError(true);
+          console.log(error);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+  };    
 
   useEffect(() => {
     filterMovies();
@@ -186,7 +214,8 @@ return (
                   cards={filteredCards}
                   visibleCardsCount={visibleCardsCount}
                   savedCards={savedCards}
-                  onSaveCard={onSaveCard}
+                  onLikeCard={onLikeCard}
+                  onDelete={onDelete}
                 />
                 {visibleCardsCount < filteredCards.length && (
                   <button 

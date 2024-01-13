@@ -3,15 +3,17 @@ import icon from '../../images/search_icon.svg';
 import { FilterCheckbox } from '../FilterCheckbox/FilterCheckbox';
 import useWindowDimensions from '../../hooks/useWindowDimensions.js';
 
-function SearchForm({ 
-  onSubmit, 
-  onChange, 
-  value, 
-  checked,
-  onCheckboxChange, 
-  isError, 
-  isSending,
-}) {
+function SearchForm(props) {
+
+  const { 
+    onSubmit, 
+    onChange, 
+    value, 
+    checked,
+    onCheckboxChange, 
+    isError, 
+    isSending,
+  } = props;
 
   // лупу видно только на разрешении > 525px
   const isMobileWidth = useWindowDimensions() <= 525;

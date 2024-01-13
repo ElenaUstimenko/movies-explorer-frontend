@@ -4,16 +4,18 @@ import { CurrentUserContext } from "../../contexts/CurrentUserContext.js";
 import { Link } from 'react-router-dom';
 import useValidation from '../../hooks/useValidation.js';
 
-function Profile({ 
-  isLoading,
-  onUpdateUser, 
-  onSignOut, 
-  isError,
-  setIsError,
-  isEditing,
-  isSending,
-  onEditClick,
-}) {
+function Profile(props) {
+
+  const { 
+    isLoading,
+    onUpdateUser, 
+    onSignOut, 
+    isError,
+    setIsError,
+    isEditing,
+    isSending,
+    onEditClick, 
+  } = props;
 
   const currentUser = useContext(CurrentUserContext);
   const { errors, isValid, handleChange, resetForm, formValue } = useValidation();

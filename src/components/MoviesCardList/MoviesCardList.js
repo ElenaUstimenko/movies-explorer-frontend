@@ -3,13 +3,17 @@ import '../Movies/Movies.css';
 import { useLocation } from 'react-router-dom';
 import { MoviesCard } from '../MoviesCard/MoviesCard.js';
 
-function MoviesCardList({ 
-  cards,
-  visibleCardsCount, 
-  savedCards, 
-  onSaveCard, 
-  onDelete,
-}) {
+function MoviesCardList(props) {
+
+  const { 
+    cards,
+    visibleCardsCount, 
+    savedCards, 
+    onLikeCard, 
+    onDelete,
+  } = props;
+
+
   // console.log('cards', cards);
   const { pathname } = useLocation();
 
@@ -31,7 +35,8 @@ function MoviesCardList({
           <MoviesCard 
             key={card.id}
             card={card} 
-            onSaveCard={onSaveCard} 
+            onLikeCard={onLikeCard} 
+            onDeleteLikeCard={onDelete}
             savedCards={savedCards} 
           /> 
           )))
@@ -39,7 +44,7 @@ function MoviesCardList({
           <MoviesCard
             key={card._id}
             card={card} 
-            onCardDelete={onDelete}
+            onDeleteLikeCard={onDelete}
             savedCards={savedCards}
           />
           )))

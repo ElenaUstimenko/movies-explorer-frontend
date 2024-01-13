@@ -17,8 +17,6 @@ import {
   deleteCard,
 } from '../../utils/MainApi.js';
 
-import { moviesApi } from '../../utils/MoviesApi.js';
-
 import { Header } from '../Header/Header.js';
 import { Main } from '../Main/Main.js';
 import { Footer } from '../Footer/Footer.js';
@@ -41,7 +39,6 @@ function App() {
   
   const navigate = useNavigate();
   const { pathname } = useLocation();
-
 
   // ОШИБКА 1
   // После каждой выдачи попапа происходит перезагрузка приложения. Такого эффекта в SPA не должно быть.
@@ -73,31 +70,14 @@ function App() {
     } 
   };
 
-  // ОШИБКА 2
-  // Как надо: Если запрос выполняется впервые, то работа с фильтром происходит после получения данных.
-  // По условию задания запрос к базе с фильмами должен производиться при первом поиске, 
-  // а не при монтировании компонента или загрузке страницы 
-  // => убрать moviesApi.getMovies() из App.js, перенести про id?
-
   useEffect(() => {
     setIsLoading(true);
     if(loggedIn) {
       const token = localStorage.getItem('jwt');
-      Promise.all([ getAllContent(token), getSavedMovies(token), moviesApi.getMovies()])
-        .then(([userInfo, savedMovies, movies]) => {
+      Promise.all([ getAllContent(token), getSavedMovies(token)])
+        .then(([userInfo, savedMovies]) => {
           setCurrentUser(userInfo);
-          // добавляем id в каждый savedMovie из запроса для отображения лайка
-          const updatedSavedMovies = savedMovies.map(movie => {
-            const correspondingMovie = movies.find(m => m.trailerLink === movie.trailerLink)
-            if (correspondingMovie) {
-              return {
-                ...movie,
-                id: correspondingMovie.id,
-                _id: movie._id
-              }
-            }
-          })
-          setSavedCards(updatedSavedMovies);
+          setSavedCards(savedMovies);
         })
         .catch((error) => console.log(`Ошибка получения данных ${error}`))
         .finally(() => {
@@ -175,24 +155,6 @@ function App() {
     });
   };
 
-  // вызывается при монтировании и отправляет запрос checkToken если jwt есть в хранилище
-  useEffect (() => {
-    const token = localStorage.getItem('jwt');
-      if(token) {
-        checkToken(token)
-        .then((res) => {
-          if(res) {
-            setLoggedIn(true);
-            // navigate('/movies');
-          } // else {
-            // navigate('/signin');
-          //}
-        }).catch(({ status, message }) => {
-          setIsError({ status, message });
-          })
-          }
-  }, []);
-
   // стейт, отвечающий за данные пользователя
   const [currentUser, setCurrentUser] = useState({});
 
@@ -256,38 +218,20 @@ function App() {
   };
 
   // MOVIES
-  // сохранение карточки и удаление из списка сохранённых на вкладке movies
-  const handleSaveCard = useCallback((card, isLiked) => {
+  // лайк карточки, её сохранение на вкладке movies
+  const handleSaveCard = useCallback((card) => {
     const token = localStorage.getItem('jwt');
-    
-    if(isLiked) {  
-      handleCardDelete(card);
-    } else {
-      return saveCard(card, token)
-      .then((newCard) => {
-        setSavedCards(prev => ([
-          {
-            country: card.country,
-            director: card.director,
-            duration: card.duration,
-            description: card.description,
-            year: card.year,
-            image: `https://api.nomoreparties.co${card.image.url}`,
-            trailerLink: card.trailerLink,
-            thumbnail: `https://api.nomoreparties.co${card.image.formats.thumbnail.url}`,
-            nameRU: card.nameRU,
-            nameEN: card.nameEN,
-            _id: newCard._id,
-            id: card.id
-          },
-          ...prev]));
-        // console.log('[newCard, ...savedCards]: ', [newCard, ...savedCards]);
-      })
-      .catch((error) => console.log('Ошибка при сохранении фильма', error))
-    }
+    return saveCard(card, token)
+    .then((newCard) => {
+      setSavedCards(prev => ([
+        newCard,
+        ...prev]));
+      console.log('[newCard, ...savedCards]: ', [newCard, ...savedCards]);
+    })
+    .catch((error) => console.log('Ошибка при сохранении фильма', error))
   }, [savedCards]);
 
-  // на вкладке saved-movies
+  // удаление карточки
   function handleCardDelete(card) {
     console.log('handleCardDelete card', card)
     const token = localStorage.getItem('jwt');
@@ -311,13 +255,9 @@ function App() {
         <Route path='/movies' element={
           <ProtectedRoute
             element={Movies}
-            isLoading={isLoading}
-            isSending={isSending}
-            setIsLoading={setIsLoading}
-            setIsSending={setIsSending}
-            onSaveCard={handleSaveCard}
+            onLikeCard={handleSaveCard}
+            onDelete={handleCardDelete}
             loggedIn={loggedIn}
-            setIsError={setIsError}
             savedCards={savedCards}
           />} 
         />
@@ -325,10 +265,6 @@ function App() {
         <Route path='/saved-movies' element={
           <ProtectedRoute
             element={SavedMovies}
-            isLoading={isLoading}
-            isSending={isSending}
-            setIsLoading={setIsLoading}
-            setIsSending={setIsSending} 
             savedCards={savedCards}
             onDelete={handleCardDelete}
             loggedIn={loggedIn}

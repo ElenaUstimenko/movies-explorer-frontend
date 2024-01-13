@@ -1,6 +1,8 @@
 import './InfoPopup.css';
 
-function InfoPopup({ title, isOpen, onSubmit }) {
+function InfoPopup(props) {
+
+  const { title, isOpen, onSubmit } = props;
 
   const handleSubmit = (evt) => {
     // evt.preventDefault();

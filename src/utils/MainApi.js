@@ -43,7 +43,7 @@ export const login = ({ name, email, password }) => {
   .then(handleResponse);
  };
 
-export const checkToken = () => {
+/*export const checkToken = () => {
   return fetch(`${baseURL}/users/me`, {
     method: "GET",
     headers: {
@@ -52,7 +52,7 @@ export const checkToken = () => {
       'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
     },
   }).then(handleResponse);
-};
+};*/
 
 // загрузка инфо о пользователе с сервера
 export const getUserIDInfo = () => {
@@ -113,6 +113,7 @@ export const saveCard = (card, token) => {
       thumbnail: `https://api.nomoreparties.co${card.image.formats.thumbnail.url}`,
       nameRU: card.nameRU,
       nameEN: card.nameEN,
+      id: card.id,
     }),
   }).then(handleResponse);
 };

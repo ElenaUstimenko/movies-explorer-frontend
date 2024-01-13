@@ -7,16 +7,17 @@ import { Preloader } from '../Preloader/Preloader.js';
 import { useScreen } from '../../hooks/useScreen.js';
 import { SHORT_MOVIE_MINUTES } from '../../utils/constants.js';
 
-function SavedMovies({ 
-  loggedIn,
-  savedCards, 
-  onDelete, 
-  isLoading,
-  isSending,
-  setIsLoading,
-  setIsError,
-  }) {
+function SavedMovies(props) {
 
+  const { 
+    loggedIn,
+    savedCards, 
+    onDelete, 
+  } = props;
+
+  const [isLoading, setIsLoading] = useState(false); // процесс загрузки данных
+  const [isError, setIsError] = useState({}); // ошибки в инпутах
+  const [isSending, setIsSending] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredCards, setFilteredCards] = useState([]);
   const [isShortMovie, setIsShortMovie] = useState(false);
@@ -47,7 +48,7 @@ function SavedMovies({
   // фильтрация карточек
   const filterMovies = useCallback(() => {
     const query = searchQuery.toLowerCase();
-    // console.log('savedCards to check /saved-movies:', savedCards);
+    
     let filteredMovies = savedCards.filter((movie) => {
       const movieTitleRU = movie.nameRU.toLowerCase();
       const movieTitleEN = movie.nameEN.toLowerCase();
@@ -120,7 +121,7 @@ function SavedMovies({
                   onDelete={onDelete}
                 />
               </>)
-            : <Preloader />
+            : <Preloader /> 
       }
     </section>
   );

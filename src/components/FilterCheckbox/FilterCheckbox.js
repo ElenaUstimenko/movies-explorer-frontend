@@ -1,6 +1,8 @@
 import './FilterCheckbox.css';
 
-function FilterCheckbox({ checked, onChange }) {
+function FilterCheckbox(props) {
+
+  const { checked, onChange } = props;
   
   return (
     <div className='filter-checkbox'>

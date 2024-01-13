@@ -6,7 +6,9 @@ import { Navigation } from '../Navigation/Navigation.js';
 import useWindowDimensions from '../../hooks/useWindowDimensions.js';
 import { HamburgerMenu } from '../HamburgerMenu/HamburgerMenu.js';
 
-function Header({ loggedIn }) {
+function Header(props) {
+
+  const { loggedIn } = props;
 
   const { pathname } = useLocation();
   const navigate = useNavigate();

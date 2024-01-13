@@ -1,6 +1,7 @@
 .not-found {
   width: 100%;
   max-width: 1280px;
+  height: 100vh;
   padding: 246px 0 60px 0;
   margin: 0 auto;
   box-sizing: border-box;

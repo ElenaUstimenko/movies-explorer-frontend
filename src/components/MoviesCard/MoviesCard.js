@@ -2,12 +2,14 @@ import './MoviesCard.css';
 import { useLocation } from 'react-router-dom';
 import useWindowDimensions from '../../hooks/useWindowDimensions.js';
 
-function MoviesCard({ 
-  card, 
-  onSaveCard, 
-  onCardDelete, 
-  savedCards,
-}) {
+function MoviesCard(props) {
+
+  const { 
+    card, 
+    onLikeCard, 
+    onDeleteLikeCard, 
+    savedCards,
+  } = props;
 
   const isMobileWidth = useWindowDimensions() <= 768;
 
@@ -26,14 +28,13 @@ function MoviesCard({
 
   const isLiked = savedCards.some(item => item.id === card.id)
   
-  // сохранение фильма
-  const handleSaveClick = () => {
-    onSaveCard(card, isLiked);
-  };
-
-  // удаление фильма
-  const handleDeleteClick = () => {
-    onCardDelete(card);
+  // постановка или снятие лайка
+  const handleLikeCard = () => {
+    if(isLiked) {  
+      onDeleteLikeCard(card);
+    } else {
+      onLikeCard(card);
+    }
   };
 
   // цвета кнопки лайка
@@ -66,16 +67,16 @@ function MoviesCard({
         {pathname === '/movies' 
           ? ( 
             <button 
-              onClick={handleSaveClick}
+              onClick={handleLikeCard}
               name='button' 
               type='submit'
-              aria-label='Сохранить в избранное'
+              aria-label='Сохранить в избранное или удалить'
               className={cardLikeButtonClassName}>
             </button>
             ) 
           : (
             <button 
-              onClick={handleDeleteClick}
+              onClick={handleLikeCard}
               name='button' 
               type='submit'
               aria-label='Удалить из избранного'

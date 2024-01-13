@@ -1,10 +1,9 @@
 import { useEffect } from 'react';
 import { Navigation } from '../Navigation/Navigation.js';
 
-function HamburgerMenu({
-  burgerMenuActive,
-  setBurgerMenuActive,
-  }) {
+function HamburgerMenu(props) {
+
+  const { burgerMenuActive, setBurgerMenuActive } = props;
 
   useEffect(() => {
     const body = document.body;
