@@ -1,13 +1,22 @@
 import './Register.css';
-import React, { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import logo from '../../images/logo/logo-smile.svg'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import useValidation from '../../hooks/useValidation.js';
+import { register } from '../../utils/MainApi.js';
 
 function Register(props) {
 
-  const { onRegisterUser, setIsError } = props;
+  const { 
+    setIsError,
+    setInfoPopup,
+    setInfoPopupText,
+  } = props;
+
+  const [isEditing, setIsEditing] = useState(false); // режим изменения для редактирования
+  
   const { errors, isValid, handleChange, resetForm, formValue } = useValidation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     resetForm();
@@ -20,12 +29,43 @@ function Register(props) {
 
   function handleSubmit (evt) {
     evt.preventDefault();
-    onRegisterUser({
+    handleRegister({
       name: formValue.name,
       email: formValue.email,
       password: formValue.password,
     })
   };
+
+ // регистрация
+ function handleRegister({ name, email, password }) {
+  setIsEditing(true);
+
+  return register({ name, email, password })
+  .then((res) => {
+    if (res) {
+      console.log(res);
+      navigate('/signin');
+      setInfoPopup(true);
+      setInfoPopupText('Вы успешно зарегистрировались!');
+    }
+  }).catch(error => {
+
+    if (error === 409) {
+      setInfoPopup(true);
+      setInfoPopupText('Пользователь с таким email уже существует.')   
+    } else if (error === 500) {
+      setInfoPopup(true);
+      setInfoPopupText('На сервере произошла ошибка.');
+    } else {
+      setInfoPopup(true);
+      setInfoPopupText('Что-то пошло не так! Попробуйте ещё раз.');
+      console.log(error)
+    }
+  })
+  .finally(() => {
+    setIsEditing(false);
+  })
+};
 
   return (
     <section className='register'>

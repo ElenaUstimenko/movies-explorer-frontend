@@ -1,5 +1,5 @@
 import './Profile.css';
-import { useContext, useEffect } from "react";
+import { useState, useContext, useEffect } from "react";
 import { CurrentUserContext } from "../../contexts/CurrentUserContext.js";
 import { Link } from 'react-router-dom';
 import useValidation from '../../hooks/useValidation.js';
@@ -7,15 +7,19 @@ import useValidation from '../../hooks/useValidation.js';
 function Profile(props) {
 
   const { 
-    isLoading,
-    onUpdateUser, 
+    loggedIn, 
     onSignOut, 
     isError,
     setIsError,
-    isEditing,
-    isSending,
-    onEditClick, 
+    userInformation,
+    setCurrentUser,
+    setInfoPopup,
+    setInfoPopupText,
   } = props;
+
+  const [isLoading, setIsLoading] = useState(false); // процесс загрузки данных
+  const [isEditing, setIsEditing] = useState(false); // режим изменения для редактирования
+  const [isSending, setIsSending] = useState(false);
 
   const currentUser = useContext(CurrentUserContext);
   const { errors, isValid, handleChange, resetForm, formValue } = useValidation();
@@ -39,11 +43,41 @@ function Profile(props) {
 
   function handleSubmit (evt) {
     evt.preventDefault();
-    onUpdateUser({ 
+    handleUpdateUser({ 
       name: formValue.name,
       email: formValue.email,
     });
   };
+
+// редактирование профиля 
+const handleUpdateUser = ({ name, email }) => {
+  setIsLoading(true);
+  userInformation({ name, email })
+  .then(({ name, email }) => {
+    setCurrentUser({ ...currentUser, name, email });
+  }).catch(error => {
+
+    if (error === 409) {
+      setInfoPopup(true);
+      setInfoPopupText('Пользователь с таким email уже существует.')   
+    } else if (error === 500) {
+      setInfoPopup(true);
+      setInfoPopupText('На сервере произошла ошибка.')   
+    } else {
+      setInfoPopup(true);
+      setInfoPopupText('Что-то пошло не так! Попробуйте ещё раз.');
+    }
+  }).finally(() => {
+    setIsLoading(false);
+    setIsEditing(false);
+  });
+};
+
+ // режим редактирования
+ const handleEditClick = () => {
+  setIsEditing(true);
+  setIsError(false);
+};
 
   return (
     <section className='profile'>
@@ -131,7 +165,7 @@ function Profile(props) {
                 className="button profile__registration"
                 type='button'
                 aria-label='Редактирование данных профиля'
-                onClick={onEditClick}>
+                onClick={handleEditClick}>
                 Редактировать
               </button>
               <Link

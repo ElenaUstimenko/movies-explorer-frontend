@@ -1,5 +1,6 @@
 import './Movies.css';
 import { useState, useEffect, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import { moviesApi } from "../../utils/MoviesApi.js";
 import { SearchForm } from '../SearchForm/SearchForm.js';
 import { MoviesCardList } from '../MoviesCardList/MoviesCardList.js';
@@ -25,6 +26,9 @@ function Movies(props) {
   const [filteredCards, setFilteredCards] = useState([]);
   const [isShortMovie, setIsShortMovie] = useState(false);
   const [isInputError, setIsInputError] = useState(false);
+  const [isSubmit, setIsSubmit] = useState(false);
+
+  const { pathname } = useLocation();
 
   // отображение определённого количества карточек
   const [visibleCardsCount, setVisibleCardsCount] = useState(0);
@@ -78,6 +82,7 @@ function Movies(props) {
   // фильтрация карточек на стороне клиента
   const filterMovies = useCallback(() => {
     const query = searchQuery.toLowerCase();
+    
     let filteredMovies = cards.filter((movie) => {
       const movieTitleRU = movie.nameRU.toLowerCase();
       const movieTitleEN = movie.nameEN.toLowerCase();
@@ -88,27 +93,24 @@ function Movies(props) {
       filteredMovies = filteredMovies.filter((movie) => movie.duration <= SHORT_MOVIE_MINUTES);
     }
     setFilteredCards(filteredMovies);
-  }, [isShortMovie, cards]);
+    setIsSubmit(false);
+  }, [isSubmit, isShortMovie, cards]);
 
-  // ОШИБКА 2
-  // Как надо: При запросе к серверу за фильмами на странице «Фильмы» вы получаете сразу все данные и сохраняете их
-  // при каждом поиске фильмов данные запрашиваются с сервера, не нужно повторно делать запрос, 
-  // нужно использовать данные предыдущего т.к. данные сервер возвращает те же самые - по заданию 
-  // => handleSearchMovies из Movies.js
-
-
-  // работает если перезагрузить - переделать ещё
-  // поиск фильмов
-  /*const handleSearchMovies = () => {
-    //setIsLoading(true);
-    //setIsSending(true);
+  // поиск фильмов первый раз с сервера, затем из local storage
+  const handleSearchMovies = () => {
     
-    if (cards.length !== 0) {
+    if (cards.length !== 0 ) {
+      setIsLoading(true);
+      setIsSending(true);
+    
       filterMovies(searchQuery, isShortMovie, cards);
       localStorage.setItem('search', JSON.stringify(searchQuery));
       localStorage.setItem('isShort', JSON.stringify(isShortMovie));
       localStorage.setItem('movies', JSON.stringify(cards));
-      setCards(cards);
+       
+      setIsLoading(false);
+      setIsSending(false);
+
     } else {
       setIsLoading(true);
       setIsSending(true);
@@ -121,7 +123,6 @@ function Movies(props) {
         localStorage.setItem('search', JSON.stringify(searchQuery));
         localStorage.setItem('isShort', JSON.stringify(isShortMovie));
         localStorage.setItem('movies', JSON.stringify(cards));
-        setIsSending(false);
       })
         .catch((error) => {
           setIsError(true);
@@ -129,32 +130,10 @@ function Movies(props) {
         })
         .finally(() => {
           setIsLoading(false);
-          // setIsSending(false);
+          setIsSending(false);
         });
       }
-    };*/
-  const handleSearchMovies = () => {
-    setIsLoading(true);
-    setIsSending(true);
-    moviesApi
-      .getMovies()
-      .then((cards) => {
-        setCards(cards);
-  
-        filterMovies(searchQuery, isShortMovie, cards);
-        localStorage.setItem('search', JSON.stringify(searchQuery));
-        localStorage.setItem('isShort', JSON.stringify(isShortMovie));
-        localStorage.setItem('movies', JSON.stringify(cards));
-        setIsSending(false);
-      })
-        .catch((error) => {
-          setIsError(true);
-          console.log(error);
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
-  };    
+    };
 
   useEffect(() => {
     filterMovies();
@@ -185,8 +164,9 @@ function Movies(props) {
     } else {
       handleShowCards();
       handleSearchMovies(filteredCards);
+      setIsSubmit(true);
       setIsInputError(false);
-    } 
+    }
   };
 
 return (
@@ -227,12 +207,12 @@ return (
                 )}
               </>
               ) 
-            : <Preloader />     
+            : cards.length !== 0 && pathname === '/movies'
+              ? <p className='movies-error'>Ничего не найдено</p>
+              : <Preloader />
       }
     </section>
   );
 };
 
 export { Movies };
-
-//<p className='movies-error'>Ничего не найдено</p>

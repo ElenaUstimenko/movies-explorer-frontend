@@ -12,19 +12,8 @@ function MoviesCardList(props) {
     onLikeCard, 
     onDelete,
   } = props;
-
-
-  // console.log('cards', cards);
+  
   const { pathname } = useLocation();
-
-
-  // ОШИБКА 4
-  // Если ничего не найдено, выводится надпись «Ничего не найдено».
-  // Надпись "Ничего не найдено" присутствует на странице фильмов сразу же при входе, 
-  // когда пользователь ещё ничего не искал, а не только когда ничего не найдено.
-  // => убрала <p className='movies-error'>Ничего не найдено</p> из Movies.js, заменила на прелоадер, 
-  // нужно добавить <p className='movies-error'>Ничего не найдено</p>  условием в MoviesCardList.js, 
-  // чтобы или загружались карточки или была надпись? 
 
   return (
     <div className="movies-card-list">
@@ -39,7 +28,8 @@ function MoviesCardList(props) {
             onDeleteLikeCard={onDelete}
             savedCards={savedCards} 
           /> 
-          )))
+        )))
+        
         : (savedCards.slice(0, visibleCardsCount).map((card) => (
           <MoviesCard
             key={card._id}
@@ -47,7 +37,7 @@ function MoviesCardList(props) {
             onDeleteLikeCard={onDelete}
             savedCards={savedCards}
           />
-          )))
+        )))
       }
       </ul>
     </div>
@@ -55,6 +45,3 @@ function MoviesCardList(props) {
 };
 
 export { MoviesCardList };
-
-
-//<p className='movies-error'>Ничего не найдено</p>

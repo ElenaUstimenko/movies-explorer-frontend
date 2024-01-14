@@ -5,7 +5,7 @@ function InfoPopup(props) {
   const { title, isOpen, onSubmit } = props;
 
   const handleSubmit = (evt) => {
-    // evt.preventDefault();
+    evt.preventDefault();
     onSubmit();
   };
 
@@ -18,8 +18,6 @@ function InfoPopup(props) {
         <button 
           type='submit' 
           className='info-popup__button' 
-          // onClick={(evt) => onSubmit(evt)}
-          // onSubmit={handleSubmit}
           >ОК
         </button>
       </form>

@@ -1,6 +1,7 @@
 import './SavedMovies.css';
 import '../Movies/Movies.css';
 import { useState, useCallback,  useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { SearchForm } from '../SearchForm/SearchForm.js';
 import { MoviesCardList } from '../MoviesCardList/MoviesCardList.js';
 import { Preloader } from '../Preloader/Preloader.js';
@@ -10,9 +11,9 @@ import { SHORT_MOVIE_MINUTES } from '../../utils/constants.js';
 function SavedMovies(props) {
 
   const { 
-    loggedIn,
+    loggedIn, 
     savedCards, 
-    onDelete, 
+    onDelete 
   } = props;
 
   const [isLoading, setIsLoading] = useState(false); // процесс загрузки данных
@@ -25,6 +26,8 @@ function SavedMovies(props) {
   const [isErrorCards, setIsErrorCards] = useState(false);
   const [isInputError, setIsInputError] = useState(false);
   const [isSubmit, setIsSubmit] = useState(false);
+
+  const { pathname } = useLocation();
 
   // отображение определённого количества карточек
   const { isDesktop, isTablet, isSmallTablet, isMobile } = useScreen();
@@ -58,7 +61,10 @@ function SavedMovies(props) {
       filteredMovies = filteredMovies.filter((movie) => movie.duration <= SHORT_MOVIE_MINUTES);
     }
     setFilteredCards(filteredMovies);
+    setIsSubmit(false);
   }, [isSubmit, isShortMovie, savedCards]);
+
+console.log(isSubmit)
 
   // поиск по фильмам
   const handleMoviesSearch = () => {
@@ -81,9 +87,9 @@ function SavedMovies(props) {
       setIsLoading(false);
       setIsInputError(true);
     } else {
-      setIsSubmit(true);
       setIsLoading(false);
       handleMoviesSearch();
+      setIsSubmit(true);
       setIsInputError(false);
     }
   };
@@ -121,12 +127,12 @@ function SavedMovies(props) {
                   onDelete={onDelete}
                 />
               </>)
-            : <Preloader /> 
+            : savedCards.length !== 0 && pathname === '/saved-movies'
+              ? <p className='movies-error'>Ничего не найдено</p>
+              : <Preloader />
       }
     </section>
   );
 };
 
 export { SavedMovies };
-
-//<p className='movies-error'>Ничего не найдено</p>

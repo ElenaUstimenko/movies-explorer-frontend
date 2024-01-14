@@ -3,12 +3,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import { ProtectedRoute } from '../ProtectedRoute/ProtectedRoute.js';
 import { CurrentUserContext } from '../../contexts/CurrentUserContext.js';
-import useValidation from '../../hooks/useValidation.js';
 
 import { 
-  register, 
-  login, 
-  checkToken, 
   getUserIDInfo, 
   userInformation,
   getAllContent,
@@ -33,16 +29,10 @@ function App() {
   const [isLoading, setIsLoading] = useState(false); // процесс загрузки данных
   const [loggedIn, setLoggedIn] = useState(false); // хранение состояния авторизации
   const [isError, setIsError] = useState({}); // ошибки в инпутах
-  const [isEditing, setIsEditing] = useState(false); // режим изменения для редактирования
-  const [isSending, setIsSending] = useState(false);
   const [savedCards, setSavedCards] = useState([]);
   
   const navigate = useNavigate();
   const { pathname } = useLocation();
-
-  // ОШИБКА 1
-  // После каждой выдачи попапа происходит перезагрузка приложения. Такого эффекта в SPA не должно быть.
-  // => перекидывает на /, как исправить?
 
   // INFO POPUP
   const [infoPopup, setInfoPopup] = useState(false);
@@ -86,75 +76,6 @@ function App() {
       }
   }, [loggedIn]);
 
-  // USER
-  const { errors, isValid, handleChange, resetForm, formValue } = useValidation();
-
-  // регистрация
-  function handleRegister({ name, email, password }) {
-    setIsLoading(true);
-
-    return register({ name, email, password })
-    .then((res) => {
-      if (res) {
-        console.log(res);
-        setLoggedIn(true);
-        setCurrentUser(res);
-        handleLogin({ email, password });
-        navigate('/signin');
-        setInfoPopup(true);
-        setInfoPopupText('Вы успешно зарегистрировались!');
-      }
-    }).catch(error => {
-
-      if (error === 409) {
-        setInfoPopup(true);
-        setInfoPopupText('Пользователь с таким email уже существует.')   
-      } else if (error === 500) {
-        setInfoPopup(true);
-        setInfoPopupText('На сервере произошла ошибка.');
-      } else {
-        setInfoPopup(true);
-        setInfoPopupText('Что-то пошло не так! Попробуйте ещё раз.');
-        console.log(error)
-      }
-    })
-    .finally(() => {
-      setIsLoading(false);
-    })
-  };
-
-  // авторизация
-  const handleLogin = ({ email, password }) => {
-    setIsLoading(true);
-
-    return login({ email, password })
-    .then((res) => {
-      console.log(res)
-      
-      if (res.jwt) {
-        setLoggedIn(true);
-        localStorage.setItem('jwt', res.jwt)
-        console.log(localStorage.getItem('jwt'))
-        navigate('/movies')
-        setCurrentUser(res);
-      }
-    }).catch(error => {
-
-      if (error === 401) {
-        setInfoPopup(true);
-        setInfoPopupText('Вы ввели неправильный логин или пароль.')   
-      } else if (error === 500) {
-        setInfoPopup(true);
-        setInfoPopupText('На сервере произошла ошибка.')   
-      } else {
-        setInfoPopup(true);
-        setInfoPopupText('Что-то пошло не так! Попробуйте ещё раз.');  
-      }
-    }).finally(() => {
-      setIsLoading(false);
-    });
-  };
-
   // стейт, отвечающий за данные пользователя
   const [currentUser, setCurrentUser] = useState({});
 
@@ -175,37 +96,6 @@ function App() {
       })
     }
   }, []);
-
-  // редактирование профиля 
-  const handleUpdateUser = ({ name, email }) => {
-    setIsLoading(true);
-    userInformation({ name, email })
-    .then(({ name, email }) => {
-      setCurrentUser({ ...currentUser, name, email });
-      setInfoPopup(true);
-      setInfoPopupText('Данные успешно отредактированы!');
-    }).catch(error => {
-
-      if (error === 409) {
-        setInfoPopup(true);
-        setInfoPopupText('Пользователь с таким email уже существует.')   
-      } else if (error === 500) {
-        setInfoPopup(true);
-        setInfoPopupText('На сервере произошла ошибка.')   
-      } else {
-        setInfoPopup(true);
-        setInfoPopupText('Что-то пошло не так! Попробуйте ещё раз.');
-      }
-    }).finally(() => {
-      setIsLoading(false);
-    });
-  };
-
-  // режим редактирования
-  const handleEditClick = () => {
-    setIsEditing(true);
-    setIsError(false);
-  };
 
   // выход из профиля
   const handleSignout = (res) => {
@@ -275,29 +165,29 @@ function App() {
           <ProtectedRoute
             element={Profile}
             loggedIn={loggedIn}
-            isLoading={isLoading}
-            setCurrentUser={setCurrentUser}
-            onUpdateUser={handleUpdateUser}
             onSignOut={handleSignout}
             isError={isError}
             setIsError={setIsError}
-            isEditing={isEditing}
-            isSending={isSending}
-            onEditClick={handleEditClick}
+            userInformation={userInformation}
+            setCurrentUser={setCurrentUser}
+            setInfoPopup={setInfoPopup}
+            setInfoPopupText={setInfoPopupText}
           />} />
 
         <Route path='/signup' element={
           <Register 
-            onRegisterUser={handleRegister} 
-            isError={isError}
             setIsError={setIsError}
+            setInfoPopup={setInfoPopup}
+            setInfoPopupText={setInfoPopupText}
           />} />
 
         <Route path='/signin' element={
           <Login 
-            onLoginUser={handleLogin} 
-            isError={isError}
+            setLoggedIn={setLoggedIn}
+            setCurrentUser={setCurrentUser}
             setIsError={setIsError} 
+            setInfoPopup={setInfoPopup}
+            setInfoPopupText={setInfoPopupText}
           />} />
 
         <Route path='*' element={<NotFound />} />

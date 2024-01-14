@@ -1,15 +1,26 @@
 import './Login.css';
 import '../Register/Register.css'
-import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import logo from '../../images/logo/logo-smile.svg'
 import useValidation from '../../hooks/useValidation.js';
-import { Preloader } from '../Preloader/Preloader.js';
+
+import { login } from '../../utils/MainApi.js';
 
 function Login(props) {
 
-  const { onLoginUser, isLoading, setIsError } = props;
+  const { 
+    setLoggedIn,
+    setCurrentUser,
+    setIsError,
+    setInfoPopup,
+    setInfoPopupText,
+  } = props;
+
+  const [isLoading, setIsLoading] = useState(false); // процесс загрузки данных
+
   const { errors, isValid, handleChange, resetForm, formValue } = useValidation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     resetForm();
@@ -22,11 +33,44 @@ function Login(props) {
 
   function handleSubmit (evt) {
     evt.preventDefault();
-    onLoginUser({
+    handleLogin({
       email: formValue.email,
       password: formValue.password
     })
   };
+
+  // авторизация
+  const handleLogin = ({ email, password }) => {
+    setIsLoading(true);
+
+    return login({ email, password })
+    .then((res) => {
+      console.log(res)
+      
+      if (res.jwt) {
+        setLoggedIn(true);
+        localStorage.setItem('jwt', res.jwt)
+        console.log(localStorage.getItem('jwt'))
+        navigate('/movies')
+        setCurrentUser(res);
+      }
+    }).catch(error => {
+
+      if (error === 401) {
+        setInfoPopup(true);
+        setInfoPopupText('Вы ввели неправильный логин или пароль.')   
+      } else if (error === 500) {
+        setInfoPopup(true);
+        setInfoPopupText('На сервере произошла ошибка.')   
+      } else {
+        setInfoPopup(true);
+        setInfoPopupText('Что-то пошло не так! Попробуйте ещё раз.');  
+      }
+    }).finally(() => {
+      setIsLoading(false);
+    });
+  };
+
 
   return (
     <section className='register login'>
@@ -45,7 +89,6 @@ function Login(props) {
           noValidate
           onSubmit={handleSubmit}
         >
-          {isLoading ? <Preloader /> : ''}
           <label className='register__field'>
             <h6 className='register__discription'>E-mail</h6>
             <input 
