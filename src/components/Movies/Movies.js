@@ -6,7 +6,17 @@ import { SearchForm } from '../SearchForm/SearchForm.js';
 import { MoviesCardList } from '../MoviesCardList/MoviesCardList.js';
 import { Preloader } from '../Preloader/Preloader.js';
 import { useScreen } from '../../hooks/useScreen.js';
-import { SHORT_MOVIE_MINUTES, DESKTOP_ADD, TABLET_ADD, MOBILE_ADD } from '../../utils/constants.js';
+
+import { 
+  SHORT_MOVIE_MINUTES, 
+  DESKTOP,
+  TABLET,
+  SMALLTABLET,
+  MOBILE,
+  DESKTOP_ADD, 
+  TABLET_ADD, 
+  MOBILE_ADD 
+} from '../../utils/constants.js';
 
 function Movies(props) {
 
@@ -19,7 +29,7 @@ function Movies(props) {
 
   const [isLoading, setIsLoading] = useState(false); // процесс загрузки данных
   const [isError, setIsError] = useState({}); // ошибки в инпутах
-  const [isSending, setIsSending] = useState(false);
+  const [isSending, setIsSending] = useState(false); // для блокировки формы во время отправки запроса
   const [isErrorCards, setIsErrorCards] = useState(false);
   const [cards, setCards] = useState([]);
   const [searchQuery, setSearchQuery] = useState(''); // строка поиска
@@ -36,13 +46,13 @@ function Movies(props) {
 
   const handleShowCards = () => {
     if (isDesktop) {
-      setVisibleCardsCount(12);
+      setVisibleCardsCount(DESKTOP);
     } else if (isTablet) {
-      setVisibleCardsCount(9);
+      setVisibleCardsCount(TABLET);
     } else if (isSmallTablet) {
-      setVisibleCardsCount(8);
+      setVisibleCardsCount(SMALLTABLET);
     } else if (isMobile) {
-      setVisibleCardsCount(5);
+      setVisibleCardsCount(MOBILE);
     }
   };
 
@@ -209,7 +219,7 @@ return (
               ) 
             : cards.length !== 0 && pathname === '/movies'
               ? <p className='movies-error'>Ничего не найдено</p>
-              : <Preloader />
+              : ''
       }
     </section>
   );

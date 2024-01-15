@@ -1,14 +1,14 @@
 import './Profile.css';
 import { useState, useContext, useEffect } from "react";
 import { CurrentUserContext } from "../../contexts/CurrentUserContext.js";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import useValidation from '../../hooks/useValidation.js';
 
 function Profile(props) {
 
   const { 
-    loggedIn, 
-    onSignOut, 
+    loggedIn,
+    setLoggedIn,  
     isError,
     setIsError,
     userInformation,
@@ -19,10 +19,11 @@ function Profile(props) {
 
   const [isLoading, setIsLoading] = useState(false); // процесс загрузки данных
   const [isEditing, setIsEditing] = useState(false); // режим изменения для редактирования
-  const [isSending, setIsSending] = useState(false);
+  const [isSending, setIsSending] = useState(false); // для блокировки формы во время отправки запроса
 
   const currentUser = useContext(CurrentUserContext);
   const { errors, isValid, handleChange, resetForm, formValue } = useValidation();
+  const navigate = useNavigate();
 
   const isDataChanged =
   formValue.name !== currentUser.name ||
@@ -52,9 +53,13 @@ function Profile(props) {
 // редактирование профиля 
 const handleUpdateUser = ({ name, email }) => {
   setIsLoading(true);
+  setIsSending(true);
   userInformation({ name, email })
   .then(({ name, email }) => {
     setCurrentUser({ ...currentUser, name, email });
+    setInfoPopup(true);
+    setInfoPopupText('Данные успешно отредактированы!');
+
   }).catch(error => {
 
     if (error === 409) {
@@ -70,6 +75,7 @@ const handleUpdateUser = ({ name, email }) => {
   }).finally(() => {
     setIsLoading(false);
     setIsEditing(false);
+    setIsSending(false);
   });
 };
 
@@ -79,6 +85,17 @@ const handleUpdateUser = ({ name, email }) => {
   setIsError(false);
 };
 
+  // выход из профиля
+  const handleSignout = () => {
+    setLoggedIn(false);
+    localStorage.removeItem('jwt');
+    localStorage.removeItem('search');
+    localStorage.removeItem('isShort');
+    localStorage.removeItem('movies');
+    navigate('/');
+  };
+
+
   return (
     <section className='profile'>
       <div className='profile__container'>
@@ -87,7 +104,7 @@ const handleUpdateUser = ({ name, email }) => {
           className='form profile__form'
           name='profile'
           onSubmit={handleSubmit}
-          disabled={isSending}
+          disabled={isSending} 
           noValidate>
           <div className='profile__field'>
             <label className='profile__input-tittle'>Имя</label>
@@ -170,10 +187,10 @@ const handleUpdateUser = ({ name, email }) => {
               </button>
               <Link
                 className='profile__logout link'
-                to={'/signin'}
+                to={'/'}
                 type='button'
                 aria-label='Выход из личного кабинета пользователя'
-                onClick={onSignOut}>
+                onClick={handleSignout}>
                 Выйти из аккаунта
               </Link>
             </>

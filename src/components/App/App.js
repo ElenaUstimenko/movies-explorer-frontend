@@ -1,6 +1,6 @@
 import './App.css';
 import { useState, useEffect, useCallback } from 'react';
-import { Route, Routes, useNavigate, useLocation } from 'react-router-dom';
+import { Route, Routes, useLocation, useNavigate, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from '../ProtectedRoute/ProtectedRoute.js';
 import { CurrentUserContext } from '../../contexts/CurrentUserContext.js';
 
@@ -27,12 +27,11 @@ import { InfoPopup } from '../InfoPopup/InfoPopup.js';
 function App() {
   
   const [isLoading, setIsLoading] = useState(false); // процесс загрузки данных
-  const [loggedIn, setLoggedIn] = useState(false); // хранение состояния авторизации
   const [isError, setIsError] = useState({}); // ошибки в инпутах
   const [savedCards, setSavedCards] = useState([]);
   
-  const navigate = useNavigate();
   const { pathname } = useLocation();
+  const navigate = useNavigate();
 
   // INFO POPUP
   const [infoPopup, setInfoPopup] = useState(false);
@@ -43,13 +42,16 @@ function App() {
   };
 
   // FOR FIRST LOADING
+  const initialLoggedIn = !!localStorage.getItem('jwt');
+  const [loggedIn, setLoggedIn] = useState(initialLoggedIn); // хранение состояния авторизации
+  
   useEffect(() => {
     handleTokenCheck();
   }, []);
 
   const handleTokenCheck = () => {
     const token = localStorage.getItem('jwt');
-    if (token) {
+    if(token) {
       return getAllContent(token)
       .then((res) => {
         setLoggedIn(true);
@@ -97,16 +99,6 @@ function App() {
     }
   }, []);
 
-  // выход из профиля
-  const handleSignout = (res) => {
-    setLoggedIn(false);
-    localStorage.removeItem('jwt');
-    localStorage.removeItem('search');
-    localStorage.removeItem('isShort');
-    localStorage.removeItem('movies');
-    navigate('/');
-  };
-
   // MOVIES
   // лайк карточки, её сохранение на вкладке movies
   const handleSaveCard = useCallback((card) => {
@@ -123,7 +115,7 @@ function App() {
 
   // удаление карточки
   function handleCardDelete(card) {
-    console.log('handleCardDelete card', card)
+    // console.log('handleCardDelete card', card)
     const token = localStorage.getItem('jwt');
     const cardToDelete = savedCards.find(c => c.id === card.id)
     return deleteCard(cardToDelete._id, token)
@@ -132,6 +124,12 @@ function App() {
     })
     .catch((error => console.log('Ошибка при удалении фильма', error)))
   };
+
+  const render = (loggedIn) => {
+    if(loggedIn) {
+      navigate('/');
+      }
+    };
 
   return (
     <CurrentUserContext.Provider value={{ ...currentUser }}>
@@ -165,7 +163,7 @@ function App() {
           <ProtectedRoute
             element={Profile}
             loggedIn={loggedIn}
-            onSignOut={handleSignout}
+            setLoggedIn={setLoggedIn}
             isError={isError}
             setIsError={setIsError}
             userInformation={userInformation}
@@ -173,22 +171,29 @@ function App() {
             setInfoPopup={setInfoPopup}
             setInfoPopupText={setInfoPopupText}
           />} />
-
-        <Route path='/signup' element={
-          <Register 
+        
+        <Route path='/signup' element={loggedIn 
+          ? ( <Navigate to='/' replace /> ) 
+          : ( 
+          <Register
             setIsError={setIsError}
             setInfoPopup={setInfoPopup}
             setInfoPopupText={setInfoPopupText}
-          />} />
-
-        <Route path='/signin' element={
+          />)} 
+        />
+        
+        <Route path='/signin' element={loggedIn 
+          ? ( <Navigate to='/' replace /> ) 
+          : ( 
           <Login 
+            loggedIn={loggedIn}
             setLoggedIn={setLoggedIn}
             setCurrentUser={setCurrentUser}
             setIsError={setIsError} 
             setInfoPopup={setInfoPopup}
             setInfoPopupText={setInfoPopupText}
-          />} />
+          />)}
+        />
 
         <Route path='*' element={<NotFound />} />
       </Routes>

@@ -14,7 +14,8 @@ function Register(props) {
   } = props;
 
   const [isEditing, setIsEditing] = useState(false); // режим изменения для редактирования
-  
+  const [isSending, setIsSending] = useState(false); // для блокировки формы во время отправки запроса
+
   const { errors, isValid, handleChange, resetForm, formValue } = useValidation();
   const navigate = useNavigate();
 
@@ -39,6 +40,7 @@ function Register(props) {
  // регистрация
  function handleRegister({ name, email, password }) {
   setIsEditing(true);
+  setIsSending(true);
 
   return register({ name, email, password })
   .then((res) => {
@@ -64,6 +66,7 @@ function Register(props) {
   })
   .finally(() => {
     setIsEditing(false);
+    setIsSending(false);
   })
 };
 
@@ -83,6 +86,7 @@ function Register(props) {
           name='register' 
           className='register__form'
           noValidate
+          disabled={isSending} 
           onSubmit={handleSubmit}
         >
           <label className='register__field'>

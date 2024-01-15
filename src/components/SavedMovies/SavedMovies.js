@@ -18,7 +18,6 @@ function SavedMovies(props) {
 
   const [isLoading, setIsLoading] = useState(false); // процесс загрузки данных
   const [isError, setIsError] = useState({}); // ошибки в инпутах
-  const [isSending, setIsSending] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredCards, setFilteredCards] = useState([]);
   const [isShortMovie, setIsShortMovie] = useState(false);
@@ -64,12 +63,10 @@ function SavedMovies(props) {
     setIsSubmit(false);
   }, [isSubmit, isShortMovie, savedCards]);
 
-console.log(isSubmit)
-
   // поиск по фильмам
   const handleMoviesSearch = () => {
     filterMovies(filteredCards);
-
+   
     if((error) => {
       setIsError(true);
       console.log(error);
@@ -107,7 +104,6 @@ console.log(isSubmit)
         onChange={handleSearchChange}
         value={searchQuery}
         isError={isInputError}
-        isSending={isSending}
         // checkbox
         checked={isShortMovie}
         onCheckboxChange={handleShortMoviesChange}
@@ -129,7 +125,7 @@ console.log(isSubmit)
               </>)
             : savedCards.length !== 0 && pathname === '/saved-movies'
               ? <p className='movies-error'>Ничего не найдено</p>
-              : <Preloader />
+              : ''
       }
     </section>
   );

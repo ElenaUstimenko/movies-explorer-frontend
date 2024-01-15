@@ -10,6 +10,7 @@ import { login } from '../../utils/MainApi.js';
 function Login(props) {
 
   const { 
+    loggedIn,
     setLoggedIn,
     setCurrentUser,
     setIsError,
@@ -18,6 +19,7 @@ function Login(props) {
   } = props;
 
   const [isLoading, setIsLoading] = useState(false); // процесс загрузки данных
+  const [isSending, setIsSending] = useState(false); // для блокировки формы во время отправки запроса
 
   const { errors, isValid, handleChange, resetForm, formValue } = useValidation();
   const navigate = useNavigate();
@@ -42,6 +44,7 @@ function Login(props) {
   // авторизация
   const handleLogin = ({ email, password }) => {
     setIsLoading(true);
+    setIsSending(true);
 
     return login({ email, password })
     .then((res) => {
@@ -68,9 +71,9 @@ function Login(props) {
       }
     }).finally(() => {
       setIsLoading(false);
+      setIsSending(false);
     });
   };
-
 
   return (
     <section className='register login'>
@@ -87,6 +90,7 @@ function Login(props) {
           name='register' 
           className='register__form'
           noValidate
+          disabled={isSending}
           onSubmit={handleSubmit}
         >
           <label className='register__field'>
@@ -156,7 +160,7 @@ function Login(props) {
         </form> 
       </div> 
     </section>
-  ); 
+  );
 };
 
 export { Login };
