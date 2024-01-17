@@ -49,6 +49,7 @@ function Navigation(props) {
           <Link className='navigation__link navigation__link_type_profile' 
           to={'/profile'}
           >
+
             Аккаунт
             <img src={profileIcon} alt='белый кружочек'/>
           </Link>

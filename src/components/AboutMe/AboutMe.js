@@ -3,13 +3,14 @@ import photo from '../../images/photo/photo.jpg';
 
 function AboutMe() {
   return (
-    <div className='about-me'>
-      <h3 className='about-me__title'>Студент</h3>
-      <div className='about-me__information'>
-        <div className='about-me__text'>
-          <h2 className='about-me__name'>Елена</h2>
-          <p className='about-me__profession'>Фронтенд-разработчик</p>
-          <p className='about-me__story'>Моё первое высшее образование - экономическое, 
+
+    <section className="about-me">
+      <h3 className="about-me__title">Студент</h3>
+      <div className="about-me__information">
+        <div className="about-me__text">
+          <h2 className="about-me__name">Елена</h2>
+          <p className="about-me__profession">Фронтенд-разработчик</p>
+          <p className="about-me__story">Моё первое высшее образование - экономическое, 
           специальность "Бухгалтерский учёт, анализ и аудит", работала бухгалтером, 
           затем долгое время финансовым аналитиком. Владею английским языком, недавно 
           начала изучать корейский язык. После прохождения курса "Веб-разработчик" 
@@ -29,7 +30,7 @@ function AboutMe() {
           alt='фотография человека, которому принадлежит этот сайт'
         />
       </div>
-    </div>
+    </section>
   );
 }
 

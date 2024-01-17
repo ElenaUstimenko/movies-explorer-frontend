@@ -16,7 +16,7 @@ function MoviesCardList(props) {
   const { pathname } = useLocation();
 
   return (
-    <div className="movies-card-list">
+    <section className="movies-card-list">
       <ul className="movies-card-list__movies">
     
       {pathname === '/movies' 
