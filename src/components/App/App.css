@@ -17,6 +17,15 @@
   justify-content: center;
   background-color: rgba(32, 32, 32, 1);
   background-size: 100%;
+  input {
+    &:-webkit-autofill {
+      &, &:hover, &:focus {
+        -webkit-text-fill-color: rgba(255, 255, 255, 1);
+        -webkit-box-shadow: 0 0 0px 1000px rgba(32, 32, 32, 1) inset;
+        box-shadow: 0 0 0px 1000px rgba(32, 32, 32, 1) inset;
+      }
+    }
+  }
 }
 
 .page_no-scroll {

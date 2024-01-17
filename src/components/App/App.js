@@ -1,13 +1,21 @@
 import './App.css';
-import { Route, Routes } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { Route, Routes, useLocation, useNavigate, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from '../ProtectedRoute/ProtectedRoute.js';
-import { CurrentUserContext } from "../../contexts/CurrentUserContext.js";
-import { MoviesApi } from "../../utils/MoviesApi.js";
-import MainApi from "../../utils/MainApi.js";
-import {MOVIES_API_SETTINGS } from '../../utils/constants.js';
+import { CurrentUserContext } from '../../contexts/CurrentUserContext.js';
 
+import { 
+  getUserIDInfo, 
+  userInformation,
+  getAllContent,
+  getSavedMovies,
+  saveCard,
+  deleteCard,
+} from '../../utils/MainApi.js';
+
+import { Header } from '../Header/Header.js';
 import { Main } from '../Main/Main.js';
+import { Footer } from '../Footer/Footer.js';
 import { Movies } from '../Movies/Movies.js';
 import { SavedMovies } from '../SavedMovies/SavedMovies.js';
 import { Profile } from '../Profile/Profile.js';
@@ -15,129 +23,188 @@ import { Register } from '../Register/Register.js';
 import { Login } from '../Login/Login.js';
 import { NotFound } from '../NotFound/NotFound.js';
 import { InfoPopup } from '../InfoPopup/InfoPopup.js';
-import { Preloader } from '../Preloader/Preloader.js';
-import { Navigation } from '../Navigation/Navigation.js';
 
 function App() {
-  const [currentUser, setCurrentUser] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
-  const [burgerMenuActive, setBurgerMenuActive] = useState(false);
-  const [moviesCards, setMoviesCards] = useState([]);
-  const [filters, setFilters] = useState({});
-  const [countCards, setCountCards] = useState(window.screen.width > 768 ? 12 : window.screen.width > 400 ? 8 : 5);
+  
+  const [isLoading, setIsLoading] = useState(false); // процесс загрузки данных
+  const [isError, setIsError] = useState({}); // ошибки в инпутах
+  const [savedCards, setSavedCards] = useState([]);
+  
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
 
+  // INFO POPUP
+  const [infoPopup, setInfoPopup] = useState(false);
+  const [infoPopupText, setInfoPopupText] = useState('');
 
-  // получение всех фильмов
-  // фильтр
-  const getFilteredMovies = (movies, { text = "", short = false }) => {
-    return movies.filter(item => {
-      if (short && item.duration > 40) {
-        return false;
-      }
-      for (let key in item) {
-        if (item.hasOwnProperty(key) && typeof item[key] === "string" &&
-          item[key].toLowerCase().includes(text.toLowerCase())) {
-          return true;
-        }
-      }
-      return false;
-    });
+  const closeInfoPopup = () => {
+    setInfoPopup(false);
   };
 
-  // получение
-  const getAllMovies = () => {
+  // FOR FIRST LOADING
+  const initialLoggedIn = !!localStorage.getItem('jwt');
+  const [loggedIn, setLoggedIn] = useState(initialLoggedIn); // хранение состояния авторизации
+  
+  useEffect(() => {
+    handleTokenCheck();
+  }, []);
+
+  const handleTokenCheck = () => {
+    const token = localStorage.getItem('jwt');
+    if(token) {
+      return getAllContent(token)
+      .then((res) => {
+        setLoggedIn(true);
+      })
+      .catch(error => {
+        console.log(error);
+      })
+    } 
+  };
+
+  useEffect(() => {
     setIsLoading(true);
-    MoviesApi.getMovies()
-      .then((data) => {
-        const allMovies = data.map(({
-          country,
-          director,
-          duration,
-          year,
-          description,
-          image,
-          trailerLink,
-          thumbnail,
-          id,
-          nameRU,
-          nameEN,
-        }) => ({
-          country,
-          director,
-          duration,
-          year,
-          description,
-          image: image ? `${MOVIES_API_SETTINGS.baseUrl}${image.url}` : "",
-          trailer: trailerLink,
-          thumbnail: image ? `${MOVIES_API_SETTINGS.baseUrl}${image.url}` : "#",
-          movieId: id,
-          nameRU,
-          nameEN,
-        }));   
-        localStorage.setItem("allMovies", JSON.stringify(allMovies));
-        handleFilterAllMovies();
-      })  
-      .catch(console.error)
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }; 
+    if(loggedIn) {
+      const token = localStorage.getItem('jwt');
+      Promise.all([ getAllContent(token), getSavedMovies(token)])
+        .then(([userInfo, savedMovies]) => {
+          setCurrentUser(userInfo);
+          setSavedCards(savedMovies);
+        })
+        .catch((error) => console.log(`Ошибка получения данных ${error}`))
+        .finally(() => {
+          setIsLoading(false);
+        })
+      }
+  }, [loggedIn]);
 
-  // фильтрация всех фильмов
-  const handleFilterAllMovies = (filters) => {
-    if (localStorage.getItem("allMovies")) {
-      setIsLoading(true);
-      const filteredMovies = getFilteredMovies(JSON.parse(localStorage.getItem("allMovies")), filters) || [];
-      setMoviesCards(filteredMovies);
-      setIsLoading(false);
-    } else {
-      getAllMovies("");
+  // стейт, отвечающий за данные пользователя
+  const [currentUser, setCurrentUser] = useState({});
+
+  // вызывается при монтировании
+  // совершает запрос к API за пользовательскими данными
+  useEffect(() => {
+    const token = localStorage.getItem('jwt');
+    if(token) {
+      getUserIDInfo()
+      .then((currentUser) => {
+        setCurrentUser({
+          name: currentUser.name,
+          email: currentUser.email,
+          _id: currentUser._id,
+        })
+      }).catch(({ status, message }) => {
+        setIsError({ status, message });
+      })
     }
+  }, []);
+
+  // MOVIES
+  // лайк карточки, её сохранение на вкладке movies
+  const handleSaveCard = useCallback((card) => {
+    const token = localStorage.getItem('jwt');
+    return saveCard(card, token)
+    .then((newCard) => {
+      setSavedCards(prev => ([
+        newCard,
+        ...prev]));
+      console.log('[newCard, ...savedCards]: ', [newCard, ...savedCards]);
+    })
+    .catch((error) => console.log('Ошибка при сохранении фильма', error))
+  }, [savedCards]);
+
+  // удаление карточки
+  function handleCardDelete(card) {
+    // console.log('handleCardDelete card', card)
+    const token = localStorage.getItem('jwt');
+    const cardToDelete = savedCards.find(c => c.id === card.id)
+    return deleteCard(cardToDelete._id, token)
+    .then(() => {
+      setSavedCards((state) => state.filter((c) => c.id !== card.id));
+    })
+    .catch((error => console.log('Ошибка при удалении фильма', error)))
   };
 
-  // обработчик изменения фильтров
-  const handleChangeFilters = ({ key, value }) => {
-    setFilters(prev => {
-      handleFilterAllMovies({ ...prev, [key]: value });
-      return { ...prev, [key]: value };
-    });
-  };
-
-  // обработчик добавления новых фильмов в список
-  const handleIncCountOfCards = () => {
-    setCountCards(prev => {
-        return prev + (window.screen.width > 768 ? 3 : 2);
-      },
-    );
-  };
+  const render = (loggedIn) => {
+    if(loggedIn) {
+      navigate('/');
+      }
+    };
 
   return (
     <CurrentUserContext.Provider value={{ ...currentUser }}>
-    <div className="page">
+    <div className='page'>
+    {(pathname === '/' || pathname === '/movies' || pathname === '/saved-movies' || pathname === '/profile') && (
+      <Header loggedIn={loggedIn} /> 
+    )}
       <Routes>
         <Route path='/' element={<Main />} />
-        <Route path='/movies' element={<Movies />
-          /*<ProtectedRoute 
+  
+        <Route path='/movies' element={
+          <ProtectedRoute
             element={Movies}
-            /*condition={loggedIn}*/
-            /*moviesCards={moviesCards}
-            //usersMoviesCards={usersMoviesCards}
-            /*countCards={countCards}
-            //onSaveMovieCard={handleSaveMovieCard}
-            //onDeleteMovieCard={handleDeleteMovieCard}
-            onIncCountOfCards={handleIncCountOfCards}
-            onChangeFilters={handleChangeFilters} />*/
-        } />
+            onLikeCard={handleSaveCard}
+            onDelete={handleCardDelete}
+            loggedIn={loggedIn}
+            savedCards={savedCards}
+          />} 
+        />
 
-        <Route path='/saved-movies' element={<SavedMovies />} />
-        <Route path='/profile' element={<Profile />} />
-        <Route path='/signup' element={<Register />} />
-        <Route path='/signin' element={<Login />} />
+        <Route path='/saved-movies' element={
+          <ProtectedRoute
+            element={SavedMovies}
+            savedCards={savedCards}
+            onDelete={handleCardDelete}
+            loggedIn={loggedIn}
+          />} 
+        />
+
+        <Route path='/profile' element={
+          <ProtectedRoute
+            element={Profile}
+            loggedIn={loggedIn}
+            setLoggedIn={setLoggedIn}
+            isError={isError}
+            setIsError={setIsError}
+            userInformation={userInformation}
+            setCurrentUser={setCurrentUser}
+            setInfoPopup={setInfoPopup}
+            setInfoPopupText={setInfoPopupText}
+          />} />
+        
+        <Route path='/signup' element={loggedIn 
+          ? ( <Navigate to='/' replace /> ) 
+          : ( 
+          <Register
+            setIsError={setIsError}
+            setInfoPopup={setInfoPopup}
+            setInfoPopupText={setInfoPopupText}
+          />)} 
+        />
+        
+        <Route path='/signin' element={loggedIn 
+          ? ( <Navigate to='/' replace /> ) 
+          : ( 
+          <Login 
+            loggedIn={loggedIn}
+            setLoggedIn={setLoggedIn}
+            setCurrentUser={setCurrentUser}
+            setIsError={setIsError} 
+            setInfoPopup={setInfoPopup}
+            setInfoPopupText={setInfoPopupText}
+          />)}
+        />
+  
         <Route path='*' element={<NotFound />} />
       </Routes>
+      <Footer />
 
-      {isLoading && <Preloader/>}
-     
+      <InfoPopup 
+        isOpen={infoPopup}
+        title={infoPopupText} 
+        onSubmit={closeInfoPopup}
+      />
+      
     </div>
     </CurrentUserContext.Provider>
   );

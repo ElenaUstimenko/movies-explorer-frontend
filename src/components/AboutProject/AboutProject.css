@@ -119,6 +119,7 @@
   .about-project__main {
     max-width: 380px;
   }
+  
   .about-project__text {
     max-width: 380px;
   }
@@ -131,6 +132,7 @@
     max-width: 319px;
     margin: 22px auto 0 0;
   }
+
   .about-project__main {
     letter-spacing: -0.8px;
     max-width: 319px;
@@ -144,7 +146,7 @@
     min-height: 585px;
     padding: 90px 50px 30px 50px;
   }
-  
+
   .about-project__title { 
     max-width: 677px;
     max-height: 27px;

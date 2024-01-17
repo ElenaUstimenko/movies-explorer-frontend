@@ -1,152 +1,175 @@
-import React, { useState, useEffect } from 'react';
 import './Register.css';
+import { useState, useEffect } from 'react';
 import logo from '../../images/logo/logo-smile.svg'
-import { CurrentUserContext } from '../../contexts/CurrentUserContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import useValidation from '../../hooks/useValidation.js';
+import { register } from '../../utils/MainApi.js';
 
-function Register() {
+function Register(props) {
 
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  
-  const [nameFilled, setNameFilled] = useState(false);
-  const [emailFilled, setEmailFilled] = useState(false);
-  const [passwordFilled, setPasswordFilled] = useState(false);
+  const { 
+    setIsError,
+    setInfoPopup,
+    setInfoPopupText,
+  } = props;
 
-  const [nameError, setNameError] = useState('Поле имя не может быть пустым');
-  const [emailError, setEmailError] = useState('Поле email не может быть пустым');
-  const [passwordError, setPasswordError] = useState('Поле пароль не может быть пустым');
+  const [isEditing, setIsEditing] = useState(false); // режим изменения для редактирования
+  const [isSending, setIsSending] = useState(false); // для блокировки формы во время отправки запроса
 
-  const [formValid, setFormValid] = useState(false);
+  const { errors, isValid, handleChange, resetForm, formValue } = useValidation();
+  const navigate = useNavigate();
 
-  useEffect (() => {
-    if (nameError || emailError || passwordError) {
-      setFormValid(false)
+  useEffect(() => {
+    resetForm();
+  }, [resetForm]);
+
+  const handleInputChange = (evt) => {
+    handleChange(evt);
+    setIsError(false);
+  };
+
+  function handleSubmit (evt) {
+    evt.preventDefault();
+    handleRegister({
+      name: formValue.name,
+      email: formValue.email,
+      password: formValue.password,
+    })
+  };
+
+ // регистрация
+ function handleRegister({ name, email, password }) {
+  setIsEditing(true);
+  setIsSending(true);
+
+  return register({ name, email, password })
+  .then((res) => {
+    if (res) {
+      console.log(res);
+      navigate('/signin');
+      setInfoPopup(true);
+      setInfoPopupText('Вы успешно зарегистрировались!');
+    }
+  }).catch(error => {
+
+    if (error === 409) {
+      setInfoPopup(true);
+      setInfoPopupText('Пользователь с таким email уже существует.')   
+    } else if (error === 500) {
+      setInfoPopup(true);
+      setInfoPopupText('На сервере произошла ошибка.');
     } else {
-      setFormValid(true)
+      setInfoPopup(true);
+      setInfoPopupText('Что-то пошло не так! Попробуйте ещё раз.');
+      console.log(error)
     }
-  }, [nameError, emailError, passwordError])
-
-  const clearHandler = (evt) => {
-    switch (evt.target.name) {
-      case 'name':
-        setNameFilled(true);
-        break;
-      case 'email':
-        setEmailFilled(true);
-        break;
-      case 'password':
-        setPasswordFilled(true);
-        break;
-        default:  
-    }
-  }
-
-  const nameHandler = (evt) => {
-    setName(evt.target.value)
-    if(evt.target.value.length < 2) {
-      setNameError('Имя должно быть от 2 до 30 символов');
-      if(!evt.target.value) {
-        setNameError('Поле имя не может быть пустым');
-      }
-    } else {
-      setNameError("");
-    }
-  }
-
-  const emailHandler = (evt) => {
-    setEmail(evt.target.value)
-    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    if(!re.test(String(evt.target.value).toLowerCase())) {
-      setEmailError('Некорректный email');
-      if(!evt.target.value) {
-        setEmailError('Поле email не может быть пустым');
-      }
-    } else {
-      setEmailError("");
-    }
-  }
-
-  const passwordHandler = (evt) => {
-    setPassword(evt.target.value)
-    if(evt.target.value.length < 6 || evt.target.value.length < 8) {
-      setPasswordError('Пароль должен быть от 6 до 8 символов');
-      if(!evt.target.value) {
-        setPasswordError('Поле пароль не может быть пустым');
-      }
-    } else {
-      setPasswordError("");
-    }
-  }
+  })
+  .finally(() => {
+    setIsEditing(false);
+    setIsSending(false);
+  })
+};
 
   return (
-    <section className="register">
-      <div className="register__container">
-      <Link className="register__link" to='/'>
+    <section className='register'>
+      <div className='register__container'>
+      <Link className='register__link' to='/'>
           <img
-            className="register-logo"
+            className='register-logo'
             src={logo}
-            alt="белый улыбающийся смайлик на зелёном фоне"
+            alt='белый улыбающийся смайлик на зелёном фоне'
           />
         </Link>
-        <h3 className="register__title">Добро пожаловать!</h3>
-        <form action="#" name="register" className="register__form"
+        <h3 className='register__title'>Добро пожаловать!</h3>
+        <form 
+          action='#' 
+          name='register' 
+          className='register__form'
           noValidate
-          // onSubmit={handleSubmit}
+          disabled={isSending} 
+          onSubmit={handleSubmit}
         >
-          <label className="register__field">
-            <h6 className="register__discription">Имя</h6>
-        
-            <input id="register-input-name" type="text" name="name"
-              className="register__input_type_name register__input"
-              placeholder="Имя" minLength={2} maxLength={30} required
-              value={name} 
-              onBlur={evt => clearHandler(evt)}
-              onChange={evt => nameHandler(evt)}
+          <label className='register__field'>
+            <h6 className='register__discription'>Имя</h6>
+            <input 
+              id='register-input-name' 
+              type='text' 
+              name='name'
+              className='register__input_type_name register__input'
+              placeholder="Имя" 
+              minLength={2} 
+              maxLength={30} 
+              required
+              pattern='[A-Za-zА-Яа-я]{2,30}'
+              title='Имя должно сост. из не менее чем 2 симв., вкл. только латиницу и кириллицу.'
+              value={formValue.name || ''} 
+              onChange={handleInputChange}
             />
-            {(nameFilled && nameError) && <div className="register__input-error">{nameError}</div>}
-            
+            <span className={`register__input-error ${!isValid && errors.name
+              ? 'register__input-error' 
+              : ''}`} id='name-error' >{errors.name || ''}
+            </span>
           </label>
-          <label className="register__field">
-            <h6 className="register__discription">E-mail</h6>
-            <input id="register-input-email" type="email" name="email"
-              className="register__input_type_email register__input"
-              placeholder="E-mail" minLength={2} maxLength={30} required
-              value={email} 
-              onBlur={evt => clearHandler(evt)}
-              onChange={evt => emailHandler(evt)}
+          <label className='register__field'>
+            <h6 className='register__discription'>E-mail</h6>
+            <input 
+              id='register-input-email' 
+              type='email' 
+              name='email'
+              className='register__input_type_email register__input'
+              placeholder='E-mail' 
+              minLength={2} 
+              maxLength={30} 
+              required
+              pattern='^.+@.+\..+$'
+              title='Поле e-mail должно быть обязательно заполнено.'
+              value={formValue.email || ''} 
+              onChange={handleInputChange}
             />
-            {(emailFilled && emailError) && <div className="register__input-error">{emailError}</div>}
-            
+            <span className={`register__input-error ${!isValid && errors.email 
+              ? 'register__input-error' 
+              : ''}`} id='email-error'>{errors.email || ''}
+            </span>
           </label>
-          <label className="register__field">
-            <h6 className="register__discription">Пароль</h6>
-            <input id="password-register-input" name="password"
-              className="register__input_type_password register__input"
-              placeholder="Пароль" type="password" required
-              value={password} 
-              // onChange={({target: {value}}) => setPassword(value)}
-              onBlur={evt => clearHandler(evt)}
-              onChange={evt => passwordHandler(evt)}
+          <label className='register__field'>
+            <h6 className='register__discription'>Пароль</h6>
+            <input 
+              id='password-register-input' 
+              name='password'
+              className='register__input_type_password register__input'
+              placeholder='Пароль' 
+              type='password' 
+              required
+              pattern='.{8,}'
+              title='Пароль должен состоять из не менее чем 8 символов.'
+              value={formValue.password || ''}
+              onChange={handleInputChange} 
             />
-            {(passwordFilled && passwordError) && <div className="register__input-error">{passwordError}</div>}
-            
-          </label> 
-          <button name="button" 
-            type="submit" 
-            disabled={!formValid}
-            className="register__button">Зарегистрироваться</button>
-          <div className="register__login">
-            
-              <p className="register__text">Уже зарегистрированы?</p>
-              <Link className="register__text register__enter link" to={'/signin'}>Войти</Link>
-          
+            <span className={`register__input-error ${!isValid && errors.password 
+              ? 'register__input-error' 
+              : ''}`} id='email-error'>{errors.password || ''}
+            </span>
+          </label>
+          <button name='button'
+            type='submit' 
+            disabled={!isValid}
+            className={`register__button ${!isValid && errors 
+              ? 'register__button_disabled' 
+              : ''}`}
+            >Зарегистрироваться
+          </button>
+          <div className='register__login'>
+            <p className='register__text'
+            >Уже зарегистрированы?
+            </p>
+            <Link className='register__text register__enter link' to={'/signin'}
+            >Войти
+            </Link>
           </div>
         </form> 
       </div> 
     </section>
   );
-}
+};
 
 export { Register };

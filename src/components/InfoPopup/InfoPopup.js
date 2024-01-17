@@ -1,18 +1,26 @@
-import React from "react";
-import "./InfoPopup.css";
+import './InfoPopup.css';
 
-function InfoPopup({ message, onSubmit }) {
-  const handleSubmit = (e) => {
-    e.preventDefault();
+function InfoPopup(props) {
+
+  const { title, isOpen, onSubmit } = props;
+
+  const handleSubmit = (evt) => {
+    evt.preventDefault();
     onSubmit();
   };
 
   return (
-    /*<div className={`info-popup ${message && "info-popup__opened"}`}>*/
-    <div className="info-popup_opened">
-      <form className="info-popup__container" onSubmit={handleSubmit}>
-        <h2 className="info-popup__title">{message}</h2>
-        <button type="submit" className="info-popup__button">ОК</button>
+
+    <div className={`info-popup ${isOpen ? 'info-popup_opened' : ''}`}>
+      <form 
+        className='info-popup__container'
+        onSubmit={(evt) => handleSubmit(evt)}>
+        <h2 className='info-popup__title'>{title}</h2>
+        <button 
+          type='submit' 
+          className='info-popup__button' 
+          >ОК
+        </button>
       </form>
     </div>
   );

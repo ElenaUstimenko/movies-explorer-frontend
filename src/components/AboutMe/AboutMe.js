@@ -1,9 +1,9 @@
 import './AboutMe.css';
 import photo from '../../images/photo/photo.jpg';
 
-
 function AboutMe() {
   return (
+
     <section className="about-me">
       <h3 className="about-me__title">Студент</h3>
       <div className="about-me__information">
@@ -17,17 +17,17 @@ function AboutMe() {
           от школы "Яндекс.Практикум" планирую сменить сферу деятельности на наиболее 
           мне интересную и работать фронтенд-разработчиком.</p> 
           <a 
-            className="about-me__github link"
-            href="https://github.com/ElenaUstimenko/"
-            rel="noreferrer"
-            target="_blank"
+            className='about-me__github link'
+            href='https://github.com/ElenaUstimenko/'
+            rel='noreferrer'
+            target='_blank'
             >Github</a>
 
         </div>
         <img
-          className="about-me__photo"
+          className='about-me__photo'
           src={photo}
-          alt="фотография человека, которому принадлежит этот сайт"
+          alt='фотография человека, которому принадлежит этот сайт'
         />
       </div>
     </section>
