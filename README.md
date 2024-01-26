@@ -1,4 +1,5 @@
-Макет dark-1
+[![Обложка к видео «movies-explorer-frontend»](./src/images/movies-explorer-frontend.jpg)](https://youtu.be/FbWmu8DHu70)
+
 
 
 # **movies-explorer-frontend**  
