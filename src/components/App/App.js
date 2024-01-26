@@ -194,7 +194,7 @@ function App() {
             setInfoPopupText={setInfoPopupText}
           />)}
         />
-
+  
         <Route path='*' element={<NotFound />} />
       </Routes>
       <Footer />

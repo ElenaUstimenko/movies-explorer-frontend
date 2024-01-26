@@ -10,6 +10,7 @@ function InfoPopup(props) {
   };
 
   return (
+
     <div className={`info-popup ${isOpen ? 'info-popup_opened' : ''}`}>
       <form 
         className='info-popup__container'

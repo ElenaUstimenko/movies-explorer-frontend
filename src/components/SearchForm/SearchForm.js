@@ -54,6 +54,7 @@ function SearchForm(props) {
             />
             <span className='search-form__input-error'/>
           </label>  
+
           <button 
             name='button' 
             type='submit'
