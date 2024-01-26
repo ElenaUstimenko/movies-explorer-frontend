@@ -1,4 +1,4 @@
-[![Обложка к видео «movies-explorer-frontend»](./src/images/movies-explorer-frontend.jpg)](https://youtu.be/Y03ZXrirxRA)
+[![Обложка к видео «movies-explorer-frontend»](./src/images/movies-explorer-frontend.jpg)](https://youtu.be/FbWmu8DHu70)
 
 
 
